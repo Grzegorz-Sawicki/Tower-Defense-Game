@@ -10,11 +10,12 @@ private:
     //sf::Texture texture;
 
     //temp
-    sf::CircleShape shape;
+    sf::CircleShape sprite;
 
     sf::Vector2f velocity;
     float speed;
     Enemy* targetEnemy;
+    bool enemyDead;
     sf::Vector2f targetPos;
     int damage;
 

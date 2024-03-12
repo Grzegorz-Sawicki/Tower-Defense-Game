@@ -138,6 +138,7 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="Properties.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Tower.cpp" />
@@ -148,9 +149,11 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="include.h" />
     <ClInclude Include="Projectile.h" />
+    <ClInclude Include="Properties.h" />
     <ClInclude Include="TextureManager.hpp" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Tower.h" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="to-do.md" />

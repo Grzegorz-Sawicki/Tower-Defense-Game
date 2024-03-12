@@ -20,10 +20,13 @@ public:
 
     //Accessors
     sf::FloatRect getBounds() const;
+    sf::Vector2f getPosition() const;
     bool isOccupied();
 
     void setOccupied(bool value);
+    void setPosition(sf::Vector2f position);
 
-    void setColor();
+    void setBaseColor(sf::Color color);
+    void setColor(sf::Color color);
 };
 

@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "Projectile.h"
 #include "TextureManager.hpp"
+#include "utils.hpp"
 
 enum TowerState
 {
@@ -13,7 +14,8 @@ enum TowerState
 class Tower
 {
 private:
-	sf::Sprite sprite;
+	sf::Sprite spriteBase;
+	sf::Sprite spriteBarrel;
 	sf::Texture texture;
 
 	sf::CircleShape radiusCircle;
@@ -25,20 +27,27 @@ private:
 	int range;
 	int shootSpeed;
 
+	Enemy* targetEnemy;
+	bool targetEnemyDead;
+	bool enemyDetected;
+
 	sf::Time shootInterval;
 	sf::Time shootTimer;
 	sf::Clock clock;
 
 	TowerState state;
 
-	void initSprite();
+	void initSprites();
+	void initRadiusCircle();
 	void shoot(Enemy* enemy);
+	void rotateTowardsEnemy(Enemy* enemy);
 
 public:
 	Tower(int posX, int posY);
 	virtual ~Tower();
 
 	sf::FloatRect getBounds();
+	sf::Vector2f getPosition();
 
 	//Functions
 

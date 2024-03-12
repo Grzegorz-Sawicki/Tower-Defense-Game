@@ -10,3 +10,5 @@
 #include "SFML/Window.hpp"
 #include "SFML/Audio.hpp"
 #include "SFML/Graphics.hpp"
+
+#include "Properties.h"

@@ -2,7 +2,7 @@
 
 void Game::initWindow()
 {
-	this->videoMode = sf::VideoMode(800, 600);
+	this->videoMode = sf::VideoMode(Properties::windowWidth, Properties::windowHeight);
 	this->window = new sf::RenderWindow(this->videoMode, "Tower Defense Game", sf::Style::Close | sf::Style::Titlebar);
 	this->window->setFramerateLimit(60);
 }
@@ -15,7 +15,7 @@ void Game::initBackground()
 
 void Game::initVariables()
 {
-	this->enemySpawnTimer = sf::seconds(3);
+	this->enemySpawnTimer = sf::seconds(1);
 }
 
 void Game::initGrid(int rowNum, int colNum, float tileSize)
@@ -25,7 +25,12 @@ void Game::initGrid(int rowNum, int colNum, float tileSize)
 
 void Game::spawnEnemy()
 {
-	enemies.emplace_back(new Enemy());
+	int randSpawn = rand() % 6;
+	float randSpawnOffset = -5 + rand() % 11;
+	sf::Vector2f spawnPos = this->grid->getEntranceTiles()["HORIZONTAL"][randSpawn]->getPosition();
+	spawnPos.y += randSpawnOffset;
+	spawnPos.x -= this->window->getSize().x / 10;
+	enemies.emplace_back(new Enemy(spawnPos));
 }
 
 
@@ -36,9 +41,7 @@ Game::Game()
 	this->initWindow();
 	this->initBackground();
 	this->initVariables();
-	this->initGrid(26, 28, 18.f);
-
-	this->enemies.push_back(new Enemy());
+	this->initGrid(24, 28, 18.f);
 }
 
 Game::~Game()
@@ -106,6 +109,11 @@ void Game::update()
 	for (auto* enemy : this->enemies)
 	{
 		enemy->update();
+		if (enemy->isDead()) {
+			//DOESN'T ALWAYS WORK, BEWARE
+			enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
+			delete enemy;
+		}
 	}
 
 	for (auto* tower : this->towers)

@@ -11,6 +11,7 @@ private:
 
 	int hp;
 	int moveSpeed;
+	bool dead;
 
 	//Functions
 	void initSprite();
@@ -18,13 +19,17 @@ private:
 
 public:
 	Enemy();
+	Enemy(sf::Vector2f position);
 	virtual ~Enemy();
 
 	sf::Vector2f getPosition();
+	sf::FloatRect getBounds();
 	int getHp();
+	bool isDead();
 
 	//Functions
 	void takeDamage(int damage);
+	void die();
 
 	void update();
 	void render(sf::RenderTarget* target);
