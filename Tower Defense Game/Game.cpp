@@ -18,19 +18,19 @@ void Game::initVariables()
 	this->enemySpawnTimer = sf::seconds(1);
 }
 
-void Game::initGrid(int rowNum, int colNum, float tileSize)
+void Game::initGrid()
 {
-	this->grid = new Grid(rowNum, colNum, tileSize);
+	Grid::getInstance();
+	Grid::createPath();
+	Grid::visualizePath();
 }
 
 void Game::spawnEnemy()
 {
 	int randSpawn = rand() % 6;
-	float randSpawnOffset = -5 + rand() % 11;
-	sf::Vector2f spawnPos = this->grid->getEntranceTiles()["HORIZONTAL"][randSpawn]->getPosition();
-	spawnPos.y += randSpawnOffset;
-	spawnPos.x -= this->window->getSize().x / 10;
-	enemies.emplace_back(new Enemy(spawnPos));
+	Tile* spawnTile = Grid::getEntranceTiles()["HORIZONTAL"][randSpawn];
+	sf::Vector2f spawnOffset = sf::Vector2f(-Properties::windowWidth / 10, 0/*-5 + rand() % 11*/);
+	enemies.emplace_back(new Enemy(spawnTile, spawnOffset));
 }
 
 
@@ -41,14 +41,14 @@ Game::Game()
 	this->initWindow();
 	this->initBackground();
 	this->initVariables();
-	this->initGrid(24, 28, 18.f);
+	this->initGrid();
+	//this->spawnEnemy();
+	this->canSpawn = false;
 }
 
 Game::~Game()
 {
 	delete this->window;
-
-	delete this->grid;
 
 	for (auto* enemy : this->enemies)
 	{
@@ -71,7 +71,8 @@ void Game::run()
 	{
 		if (clock.getElapsedTime() >= enemySpawnTimer) {
 			clock.restart();
-			spawnEnemy();
+			if(this->canSpawn)
+				spawnEnemy();
 		}
 
 		this->update();
@@ -89,12 +90,28 @@ void Game::updatePollEvents()
 			this->window->close();
 			break;
 		case sf::Event::MouseMoved:
-			this->grid->handleMouseMove(sf::Vector2f(e.mouseMove.x, e.mouseMove.y));
+			Grid::handleMouseMove(sf::Vector2f(e.mouseMove.x, e.mouseMove.y));
 			break;
 		case sf::Event::MouseButtonPressed:
-			if(this->grid->canPlaceTower(sf::Mouse::getPosition(*this->window)))
-				this->towers.push_back(this->grid->placeTower(sf::Mouse::getPosition(*this->window)));
+			if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window))) {
+				this->towers.push_back(Grid::placeTower(sf::Mouse::getPosition(*this->window)));
+				Grid::resetPath();
+				Grid::createPath();
+				Grid::visualizePath();
+				for (auto* enemy : this->enemies)
+				{
+					if (enemy->didReachedEntrance()) {
+						enemy->setCurrentTile(Grid::getNearestTile(enemy->getPosition()));
+						enemy->setDirection(enemy->getCurrentTile()->getMoveDirection());
+					}
+				}
+			}
 			break;
+		case sf::Event::KeyPressed:
+			if (e.key.code == sf::Keyboard::Space) {
+				this->canSpawn = true;
+				system("pause");
+			}
 		default:
 			break;
 		}
@@ -128,7 +145,7 @@ void Game::render()
 
 	this->window->draw(this->bgSprite);
 
-	this->grid->draw(*this->window);
+	Grid::draw(*this->window);
 
 	for (auto* enemy : this->enemies)
 	{

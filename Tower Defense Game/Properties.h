@@ -6,7 +6,8 @@ struct Properties
 {
 	static int windowWidth;
 	static int windowHeight;
-	static int tileWidth;
-	static int tileHeight;
+	static float tileSize;
+	static int gridTileNumHorizontal;
+	static int gridTileNumVertical;
 };
 

@@ -15,4 +15,12 @@ namespace utils
 		return angle * (180 / 3.14159255);
 	}
 
+	inline float getDistance(sf::Vector2f sourcePos, sf::Vector2f destPos) {
+		float dx = destPos.x - sourcePos.x;
+		float dy = destPos.y - sourcePos.y;
+		float length = std::sqrt(dx * dx + dy * dy);
+
+		return length;
+	}
+
 }

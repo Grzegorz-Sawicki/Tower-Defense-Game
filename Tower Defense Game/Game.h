@@ -15,8 +15,6 @@ private:
 	sf::Sprite bgSprite;
 	sf::Texture bgTexture;
 
-	Grid* grid;
-
 	std::vector<Enemy*> enemies;
 	std::vector<Tower*> towers;
 
@@ -25,11 +23,14 @@ private:
 	unsigned gold;
 	unsigned score;
 
+	//temp
+	bool canSpawn;
+
 	//Functions
 	void initWindow();
 	void initBackground();
 	void initVariables();
-	void initGrid(int rowNum, int colNum, float tileSize);
+	void initGrid();
 
 	sf::Time enemySpawnTimer;
 	void spawnEnemy();

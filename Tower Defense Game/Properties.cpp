@@ -2,5 +2,6 @@
 
 int Properties::windowWidth = 800;
 int Properties::windowHeight = 600;
-int Properties::tileWidth = 18;
-int Properties::tileHeight = 18;
+float Properties::tileSize = 17.f;
+int Properties::gridTileNumHorizontal = 28;
+int Properties::gridTileNumVertical = 24;

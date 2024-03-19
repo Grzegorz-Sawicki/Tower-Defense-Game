@@ -5,6 +5,7 @@
 #include <math.h>
 #include <unordered_map>
 #include <string>
+#include <queue>
 
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"

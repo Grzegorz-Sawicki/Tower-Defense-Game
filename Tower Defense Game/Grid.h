@@ -3,30 +3,44 @@
 #include "include.h"
 #include "Tile.h"
 #include "Tower.h"
+#include "Properties.h"
 
 class Grid {
 private:
-    unsigned int m_rows;
-    unsigned int m_cols;
-    float m_tileSize;
-    std::vector<std::vector<Tile>> m_tiles;
-    std::map<std::string, std::vector<Tile*>> entranceTiles;
-    std::map<std::string, std::vector<Tile*>> exitTiles;
+    Grid();
 
-    void moveToCorrectPlace();
+    static unsigned int m_rows;
+    static unsigned int m_cols;
+    static float m_tileSize;
+    static std::vector<std::vector<Tile>> m_tiles;
+    static std::map<std::string, std::vector<Tile*>> entranceTiles;
+    static std::map<std::string, std::vector<Tile*>> exitTiles;
+
+    static void moveToCorrectPlace();
 
 public:
-    Grid(unsigned int rows, unsigned int cols, float tileSize);
+    // Deleted copy constructor and assignment operator to prevent cloning
+    Grid(const Grid&) = delete;
+    Grid& operator=(const Grid&) = delete;
 
-    void draw(sf::RenderWindow& window);
+    // Static method to access the singleton instance
+    static Grid& getInstance();
 
-    void handleMouseMove(const sf::Vector2f& mousePos);
+    static void draw(sf::RenderWindow& window);
 
-    std::map<std::string, std::vector<Tile*>> getEntranceTiles();
-    std::map<std::string, std::vector<Tile*>> getExitTiles();
+    static void handleMouseMove(const sf::Vector2f& mousePos);
 
-    bool canPlaceTower(const sf::Vector2i& mousePos);
-    Tower* placeTower(const sf::Vector2i& mousePos);
+    static std::map<std::string, std::vector<Tile*>> getEntranceTiles();
+    static std::map<std::string, std::vector<Tile*>> getExitTiles();
+    static Tile* getNearestTile(sf::Vector2f position);
+
+    static std::map<Arrow, Tile*> setupTileNeighbors(int row, int col);
+    static void resetPath();
+    static void createPath();
+    static void visualizePath();
+
+    static bool canPlaceTower(const sf::Vector2i& mousePos);
+    static Tower* placeTower(const sf::Vector2i& mousePos);
 };
 
 
