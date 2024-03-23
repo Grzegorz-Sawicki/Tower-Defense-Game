@@ -14,6 +14,7 @@ private:
 	int hp;
 	float moveSpeed;
 	bool dead;
+	Arrow currentArrow;
 	sf::Vector2f direction;
 	Tile* currentTile;
 	bool reachedEntrance;

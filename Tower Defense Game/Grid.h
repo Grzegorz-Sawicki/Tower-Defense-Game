@@ -5,6 +5,10 @@
 #include "Tower.h"
 #include "Properties.h"
 
+enum class Path {
+    HORIZONTAL, VERTICAL
+};
+
 class Grid {
 private:
     Grid();
@@ -13,8 +17,8 @@ private:
     static unsigned int m_cols;
     static float m_tileSize;
     static std::vector<std::vector<Tile>> m_tiles;
-    static std::map<std::string, std::vector<Tile*>> entranceTiles;
-    static std::map<std::string, std::vector<Tile*>> exitTiles;
+    static std::map<Path, std::vector<Tile*>> entranceTiles;
+    static std::map<Path, std::vector<Tile*>> exitTiles;
 
     static void moveToCorrectPlace();
 
@@ -30,14 +34,15 @@ public:
 
     static void handleMouseMove(const sf::Vector2f& mousePos);
 
-    static std::map<std::string, std::vector<Tile*>> getEntranceTiles();
-    static std::map<std::string, std::vector<Tile*>> getExitTiles();
+    static std::map<Path, std::vector<Tile*>> getEntranceTiles();
+    static std::map<Path, std::vector<Tile*>> getExitTiles();
     static Tile* getNearestTile(sf::Vector2f position);
 
     static std::map<Arrow, Tile*> setupTileNeighbors(int row, int col);
     static void resetPath();
     static void createPath();
     static void visualizePath();
+    static void visualizeOccupy();
 
     static bool canPlaceTower(const sf::Vector2i& mousePos);
     static Tower* placeTower(const sf::Vector2i& mousePos);

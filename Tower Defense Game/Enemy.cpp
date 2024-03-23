@@ -18,20 +18,25 @@ void Enemy::move()
 	Tile* upleft = this->getCurrentTile()->getNeighbors()[Arrow::UPLEFT];
 	Tile* downleft = this->getCurrentTile()->getNeighbors()[Arrow::DOWNLEFT];
 
-	moveCase(this->getCurrentTile()->getNeighbors()[this->currentTile->getArrow()]);
+	moveCase(this->getCurrentTile()->getNeighbors()[this->currentArrow]);
 
 	this->sprite.move(this->direction * moveSpeed);
 }
 
 void Enemy::moveCase(Tile* tile)
 {
-	if (tile != nullptr && tile->getBounds().contains(this->sprite.getPosition())) {
-		//this->currentTile->popOccupied();
-
+	//if (tile != nullptr && tile->getBounds().contains(this->sprite.getPosition())) {
+	if (tile != nullptr && this->getPosition() == tile->getPosition()) {
+		this->currentTile->occupyDec();
 		this->currentTile = tile;
-		//this->currentTile->pushOccupied();
+		
+		Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow()];
+
+		if(nextObjectiveTile != nullptr)
+			this->currentTile->getNeighbors()[this->currentTile->getArrow()]->occupyInc();
+
+		this->currentArrow = this->currentTile->getArrow();
 		this->direction = this->currentTile->getMoveDirection();
-		//std::cout << this->currentTile << "\n";
 	}
 }
 
@@ -40,7 +45,9 @@ Enemy::Enemy(Tile* tile, sf::Vector2f spawnOffset) {
 	this->hp = 300;
 	this->dead = false;
 	this->currentTile = tile;
+	this->currentTile->occupyInc();
 	this->sprite.setPosition(this->currentTile->getPosition() + spawnOffset);
+	this->currentArrow = Arrow::DEFAULT;
 	this->direction = sf::Vector2f(1.f, 0.f);
 	this->moveSpeed = 1.f;
 	this->reachedEntrance = false;
@@ -115,9 +122,15 @@ void Enemy::update()
 {
 	if (!this->didReachedEntrance()) {
 		this->sprite.move(this->direction * moveSpeed);
-		if (this->sprite.getGlobalBounds().contains(this->getCurrentTile()->getPosition())) {
+		if (this->getCurrentTile()->getPosition() == this->getPosition()) {
 			this->reachedEntrance = true;
+			this->currentArrow = this->currentTile->getArrow();
 			this->direction = this->currentTile->getMoveDirection();
+
+			Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow()];
+
+			if (nextObjectiveTile != nullptr)
+				this->currentTile->getNeighbors()[this->currentTile->getArrow()]->occupyInc();
 		}
 	}
 	else {

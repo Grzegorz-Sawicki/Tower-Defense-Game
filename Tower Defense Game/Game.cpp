@@ -28,7 +28,7 @@ void Game::initGrid()
 void Game::spawnEnemy()
 {
 	int randSpawn = rand() % 6;
-	Tile* spawnTile = Grid::getEntranceTiles()["HORIZONTAL"][randSpawn];
+	Tile* spawnTile = Grid::getEntranceTiles()[Path::HORIZONTAL][randSpawn];
 	sf::Vector2f spawnOffset = sf::Vector2f(-Properties::windowWidth / 10, 0/*-5 + rand() % 11*/);
 	enemies.emplace_back(new Enemy(spawnTile, spawnOffset));
 }
@@ -42,7 +42,6 @@ Game::Game()
 	this->initBackground();
 	this->initVariables();
 	this->initGrid();
-	//this->spawnEnemy();
 	this->canSpawn = false;
 }
 
@@ -98,13 +97,6 @@ void Game::updatePollEvents()
 				Grid::resetPath();
 				Grid::createPath();
 				Grid::visualizePath();
-				for (auto* enemy : this->enemies)
-				{
-					if (enemy->didReachedEntrance()) {
-						enemy->setCurrentTile(Grid::getNearestTile(enemy->getPosition()));
-						enemy->setDirection(enemy->getCurrentTile()->getMoveDirection());
-					}
-				}
 			}
 			break;
 		case sf::Event::KeyPressed:

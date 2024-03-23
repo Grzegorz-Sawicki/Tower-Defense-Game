@@ -1,14 +1,16 @@
 #include "Tile.h"
 
-Tile::Tile(int row, int col, float x, float y, sf::Color baseColor, bool occupied) : row(row), col(col), occupied(occupied) {
+Tile::Tile(int row, int col, float x, float y, sf::Color baseColor, TileType type) : row(row), col(col), type(type) {
     this->shape.setSize(sf::Vector2f(Properties::tileSize, Properties::tileSize));
     this->shape.setPosition(x, y);
     this->shape.setOrigin(this->shape.getGlobalBounds().width / 2, this->shape.getGlobalBounds().height / 2);
     this->baseColor = baseColor;
     this->shape.setFillColor(this->baseColor);
+    this->occupied = false;
+    this->occupyNumber = 0;
     this->directionArrow = Arrow::DEFAULT;
-    this->type = TileType::DEFAULT;
     this->neighbors = neighbors;
+    this->distanceFromExit = -1;
 }
 
 void Tile::draw(sf::RenderWindow& window) {
@@ -27,21 +29,6 @@ void Tile::resetColor()
 {
     this->shape.setFillColor(this->baseColor);
 }
-
-//void Tile::pushOccupied()
-//{
-//    this->occupiedStack.push(true);
-//    this->occupied = true;
-//}
-//
-//void Tile::popOccupied()
-//{
-//    if (!this->occupiedStack.empty())
-//        this->occupiedStack.pop();
-//    else {
-//        this->occupied = false;
-//    }
-//}
 
 int Tile::getRow()
 {
@@ -68,9 +55,19 @@ bool Tile::isOccupied()
     return this->occupied;
 }
 
+int Tile::getOccupyNumber()
+{
+    return this->occupyNumber;
+}
+
 Arrow Tile::getArrow()
 {
     return this->directionArrow;
+}
+
+int Tile::getDistanceFromExit()
+{
+    return this->distanceFromExit;
 }
 
 TileType Tile::getType()
@@ -140,6 +137,11 @@ void Tile::setArrow(Arrow directionArrow)
     this->directionArrow = directionArrow;
 }
 
+void Tile::setDistanceFromExit(int distance)
+{
+    this->distanceFromExit = distance;
+}
+
 void Tile::setType(TileType type)
 {
     this->type = type;
@@ -152,4 +154,14 @@ void Tile::setBaseColor(sf::Color color)
 
 void Tile::setColor(sf::Color color) {
     this->shape.setFillColor(color);
+}
+
+void Tile::occupyInc()
+{
+    this->occupyNumber++;
+}
+
+void Tile::occupyDec()
+{
+    this->occupyNumber--;
 }
