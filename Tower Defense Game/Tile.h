@@ -3,14 +3,6 @@
 #include "include.h"
 #include "Properties.h"
 
-enum class Arrow {
-    DEFAULT, UP, RIGHT, DOWN, LEFT, UPRIGHT, UPLEFT, DOWNRIGHT, DOWNLEFT
-};
-
-enum class TileType {
-    DEFAULT, TOWER, WALL, ENTRANCE, EXIT
-};
-
 class Tile {
 private:
     sf::RectangleShape shape;
@@ -19,8 +11,8 @@ private:
     int row;
     int col;
     std::map<Arrow, Tile*> neighbors;
-    Arrow directionArrow;
-    int distanceFromExit;
+    std::map<Path, Arrow> pathArrows;
+    std::map<Path, int> distanceFromExits;
 
     int occupyNumber;
     bool occupied;
@@ -41,17 +33,21 @@ public:
     sf::Vector2f getPosition() const;
     bool isOccupied();
     int getOccupyNumber();
-    Arrow getArrow();
-    int getDistanceFromExit();
+
+    Arrow getArrow(Path path);
+    int getDistanceFromExit(Path path);
+
     TileType getType();
-    sf::Vector2f getMoveDirection() const;
     std::map<Arrow, Tile*> getNeighbors() const;
  
+    //Setters
     void setOccupied(bool value);
     void setPosition(sf::Vector2f position);
     void setNeighbors(std::map<Arrow, Tile*> neighbors);
-    void setArrow(Arrow directionArrow);
-    void setDistanceFromExit(int distance);
+
+    void setArrow(Arrow directionArrow, Path path);
+    void setDistanceFromExit(int distance, Path path);
+
     void setType(TileType type);
     void setBaseColor(sf::Color color);
     void setColor(sf::Color color);

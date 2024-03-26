@@ -8,9 +8,11 @@ Tile::Tile(int row, int col, float x, float y, sf::Color baseColor, TileType typ
     this->shape.setFillColor(this->baseColor);
     this->occupied = false;
     this->occupyNumber = 0;
-    this->directionArrow = Arrow::DEFAULT;
+    this->pathArrows[Path::HORIZONTAL] = Arrow::DEFAULT;
+    this->pathArrows[Path::VERTICAL] = Arrow::DEFAULT;
+    this->distanceFromExits[Path::HORIZONTAL] = -1;
+    this->distanceFromExits[Path::VERTICAL] = -1;
     this->neighbors = neighbors;
-    this->distanceFromExit = -1;
 }
 
 void Tile::draw(sf::RenderWindow& window) {
@@ -60,56 +62,19 @@ int Tile::getOccupyNumber()
     return this->occupyNumber;
 }
 
-Arrow Tile::getArrow()
+Arrow Tile::getArrow(Path path)
 {
-    return this->directionArrow;
+    return this->pathArrows[path];
 }
 
-int Tile::getDistanceFromExit()
+int Tile::getDistanceFromExit(Path path)
 {
-    return this->distanceFromExit;
+    return this->distanceFromExits[path];
 }
 
 TileType Tile::getType()
 {
     return this->type;
-}
-
-sf::Vector2f Tile::getMoveDirection() const
-{
-    sf::Vector2f directionValue;
-
-    switch (this->directionArrow) {
-    case Arrow::UP:
-        directionValue = sf::Vector2f(0.f, -1.f);
-        break;
-    case Arrow::DOWN:
-        directionValue = sf::Vector2f(0.f, 1.f);
-        break;
-    case Arrow::RIGHT:
-        directionValue = sf::Vector2f(1.f, 0.f);
-        break;
-    case Arrow::LEFT:
-        directionValue = sf::Vector2f(-1.f, 0.f);
-        break;
-    case Arrow::UPRIGHT:
-        directionValue = sf::Vector2f(1.f, -1.f);
-        break;
-    case Arrow::UPLEFT:
-        directionValue = sf::Vector2f(-1.f, -1.f);
-        break;
-    case Arrow::DOWNRIGHT:
-        directionValue = sf::Vector2f(1.f, 1.f);
-        break;
-    case Arrow::DOWNLEFT:
-        directionValue = sf::Vector2f(-1.f, 1.f);
-        break;
-    case Arrow::DEFAULT:
-        directionValue = sf::Vector2f(1.f, 0.f);
-        break;
-    }
-
-    return directionValue;
 }
 
 std::map<Arrow, Tile*> Tile::getNeighbors() const
@@ -132,14 +97,14 @@ void Tile::setNeighbors(std::map<Arrow, Tile*> neighbors)
     this->neighbors = neighbors;
 }
 
-void Tile::setArrow(Arrow directionArrow)
+void Tile::setArrow(Arrow directionArrow, Path path)
 {
-    this->directionArrow = directionArrow;
+    this->pathArrows[path] = directionArrow;
 }
 
-void Tile::setDistanceFromExit(int distance)
+void Tile::setDistanceFromExit(int distance, Path path)
 {
-    this->distanceFromExit = distance;
+    this->distanceFromExits[path] = distance;
 }
 
 void Tile::setType(TileType type)

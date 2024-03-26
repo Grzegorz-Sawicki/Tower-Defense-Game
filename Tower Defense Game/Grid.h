@@ -5,9 +5,7 @@
 #include "Tower.h"
 #include "Properties.h"
 
-enum class Path {
-    HORIZONTAL, VERTICAL
-};
+
 
 class Grid {
 private:
@@ -39,9 +37,12 @@ public:
     static Tile* getNearestTile(sf::Vector2f position);
 
     static std::map<Arrow, Tile*> setupTileNeighbors(int row, int col);
-    static void resetPath();
-    static void createPath();
-    static void visualizePath();
+    static void resetPath(Path path);
+    static void resetPaths();
+    static void createPath(Path path);
+    static void createPaths();
+    static void visualizePath(Path path);
+    static void visualizePaths();
     static void visualizeOccupy();
 
     static bool canPlaceTower(const sf::Vector2i& mousePos);

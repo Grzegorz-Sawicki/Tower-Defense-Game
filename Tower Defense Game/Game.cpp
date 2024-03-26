@@ -21,16 +21,31 @@ void Game::initVariables()
 void Game::initGrid()
 {
 	Grid::getInstance();
-	Grid::createPath();
-	Grid::visualizePath();
+	Grid::createPaths();
+	Grid::visualizePaths();
 }
 
 void Game::spawnEnemy()
 {
-	int randSpawn = rand() % 6;
-	Tile* spawnTile = Grid::getEntranceTiles()[Path::HORIZONTAL][randSpawn];
-	sf::Vector2f spawnOffset = sf::Vector2f(-Properties::windowWidth / 10, 0/*-5 + rand() % 11*/);
-	enemies.emplace_back(new Enemy(spawnTile, spawnOffset));
+	Path path = static_cast<Path>(rand() % 2);
+
+	if (path == Path::HORIZONTAL) {
+		int randSpawn = rand() % 6;
+		Tile* spawnTile = Grid::getEntranceTiles()[Path::HORIZONTAL][randSpawn];
+		sf::Vector2f spawnOffset = sf::Vector2f(-Properties::windowWidth / 10, 0);
+		Enemy* tmp = new Enemy(spawnTile, spawnOffset, Path::HORIZONTAL);
+		tmp->setPositionOffset(sf::Vector2f(0.f, -5 + rand() % 11));
+		enemies.emplace_back(tmp);
+	}
+	else if (path == Path::VERTICAL) {
+		int randSpawn = rand() % 8;
+		Tile* spawnTile = Grid::getEntranceTiles()[Path::VERTICAL][randSpawn];
+		sf::Vector2f spawnOffset = sf::Vector2f(0, -Properties::windowHeight / 10);
+		Enemy* tmp = new Enemy(spawnTile, spawnOffset, Path::VERTICAL);
+		tmp->setPositionOffset(sf::Vector2f(-5 + rand() % 11, 0.f));
+		enemies.emplace_back(tmp);
+	}
+
 }
 
 
@@ -64,6 +79,7 @@ Game::~Game()
 
 void Game::run()
 {
+
 	sf::Clock clock;
 
 	while (this->window->isOpen())
@@ -94,9 +110,9 @@ void Game::updatePollEvents()
 		case sf::Event::MouseButtonPressed:
 			if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window))) {
 				this->towers.push_back(Grid::placeTower(sf::Mouse::getPosition(*this->window)));
-				Grid::resetPath();
-				Grid::createPath();
-				Grid::visualizePath();
+				Grid::resetPaths();
+				Grid::createPaths();
+				Grid::visualizePaths();
 			}
 			break;
 		case sf::Event::KeyPressed:

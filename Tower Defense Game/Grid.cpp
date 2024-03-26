@@ -47,6 +47,7 @@ Grid::Grid() {
 	//TODO: COLORS ARE SET ONLY WHEN CURSOR IN WINDOW
 
 	// set entrance tiles
+	//HORIZONTAL
 	for (size_t i = 0; i < 6; i++)
 	{
 		Tile* tmp = &m_tiles[i + 9][0];
@@ -54,8 +55,17 @@ Grid::Grid() {
 		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
 		entranceTiles[Path::HORIZONTAL].emplace_back(tmp);
 	}
+	//VERTICAL
+	for (size_t i = 0; i < 8; i++)
+	{
+		Tile* tmp = &m_tiles[0][i+10];
+		tmp->setType(TileType::ENTRANCE);
+		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+		entranceTiles[Path::VERTICAL].emplace_back(tmp);
+	}
 
 	//set exit tiles
+	//HORIZONTAL
 	for (size_t i = 0; i < 3; i++)
 	{
 		Tile* tmp = &m_tiles[11 - i][m_cols - 1];
@@ -67,6 +77,19 @@ Grid::Grid() {
 		tmp->setType(TileType::EXIT);
 		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
 		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
+	}
+	//VERTICAL
+	for (size_t i = 0; i < 4; i++)
+	{
+		Tile* tmp = &m_tiles[m_rows - 1][13-i];
+		tmp->setType(TileType::EXIT);
+		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+		exitTiles[Path::VERTICAL].emplace_back(tmp);
+
+		tmp = &m_tiles[m_rows - 1][14+i];
+		tmp->setType(TileType::EXIT);
+		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+		exitTiles[Path::VERTICAL].emplace_back(tmp);
 	}
 
 	this->moveToCorrectPlace();
@@ -170,15 +193,20 @@ std::map<Arrow, Tile*> Grid::setupTileNeighbors(int row, int col) {
 	return neighbors;
 }
 
-void Grid::resetPath() {
+void Grid::resetPath(Path path) {
 	for (unsigned int i = 0; i < m_rows; ++i) {
 		for (unsigned int j = 0; j < m_cols; ++j) {
-			m_tiles[i][j].setArrow(Arrow::DEFAULT);
+			m_tiles[i][j].setArrow(Arrow::DEFAULT, path);
 		}
 	}
 }
 
-void Grid::createPath() {
+void Grid::resetPaths() {
+	resetPath(Path::HORIZONTAL);
+	resetPath(Path::VERTICAL);
+}
+
+void Grid::createPath(Path path) {
 	std::queue<Tile*> fifoStack;
 	std::set<Tile*> uniqueElems;
 
@@ -186,21 +214,27 @@ void Grid::createPath() {
 		if (uniqueElems.find(element) == uniqueElems.end()) {
 			fifoStack.push(element);
 			uniqueElems.insert(element);
-			element->setDistanceFromExit(distance + 1);
+			element->setDistanceFromExit(distance + 1, path);
 		}
 		};
 
-	std::vector<Tile*> tmp = exitTiles[Path::HORIZONTAL];
+	Arrow exitArrow;
+	if (path == Path::HORIZONTAL) exitArrow = Arrow::RIGHT;
+	else if (path == Path::VERTICAL) exitArrow = Arrow::DOWN;
+
+	std::vector<Tile*> tmp = exitTiles[path];
 
 	for (auto* tile : tmp) {
-		tile->setArrow(Arrow::RIGHT);
-		tile->setDistanceFromExit(0);
+		tile->setArrow(exitArrow, path);
+		tile->setDistanceFromExit(0, path);
 
-		std::map<Arrow, Tile*> neighbors = tile->getNeighbors();
-		Tile* left = neighbors[Arrow::LEFT];
+		Tile* exitNeighbor;
 
-		if (left->getType() != TileType::TOWER && left->getArrow() == Arrow::DEFAULT) {
-			enqueueUnique(neighbors[Arrow::LEFT], tile->getDistanceFromExit());
+		if (path == Path::HORIZONTAL) exitNeighbor = tile->getNeighbors()[Arrow::LEFT];
+		else exitNeighbor = tile->getNeighbors()[Arrow::UP];
+
+		if (exitNeighbor->getType() != TileType::TOWER && exitNeighbor->getArrow(path) == Arrow::DEFAULT) {
+			enqueueUnique(exitNeighbor, tile->getDistanceFromExit(path));
 		}
 	}
 
@@ -221,29 +255,29 @@ void Grid::createPath() {
 
 
 		if (!arrowSet && right != nullptr && up != nullptr) {
-			if ((upright->getType() == TileType::DEFAULT || upright->getType() == TileType::ENTRANCE) && up->getType() == TileType::DEFAULT && right->getType() == TileType::DEFAULT && (right->getArrow() == Arrow::UPRIGHT || up->getArrow() == Arrow::UPRIGHT) || (right->getArrow() == Arrow::UP && up->getArrow() == Arrow::RIGHT)) {
-				tile->setArrow(Arrow::UPRIGHT);
+			if ((upright->getType() == TileType::DEFAULT || upright->getType() == TileType::ENTRANCE) && up->getType() == TileType::DEFAULT && right->getType() == TileType::DEFAULT && (right->getArrow(path) == Arrow::UPRIGHT || up->getArrow(path) == Arrow::UPRIGHT) || (right->getArrow(path) == Arrow::UP && up->getArrow(path) == Arrow::RIGHT)) {
+				tile->setArrow(Arrow::UPRIGHT, path);
 				arrowSet = true;
 			}
 		}
 
 		if (!arrowSet && right != nullptr && down != nullptr) {
-			if ((downright->getType() == TileType::DEFAULT || downright->getType() == TileType::ENTRANCE) && down->getType() == TileType::DEFAULT && right->getType() == TileType::DEFAULT && (right->getArrow() == Arrow::DOWNRIGHT || down->getArrow() == Arrow::DOWNRIGHT) || (right->getArrow() == Arrow::DOWN && down->getArrow() == Arrow::RIGHT)) {
-				tile->setArrow(Arrow::DOWNRIGHT);
+			if ((downright->getType() == TileType::DEFAULT || downright->getType() == TileType::ENTRANCE) && down->getType() == TileType::DEFAULT && right->getType() == TileType::DEFAULT && (right->getArrow(path) == Arrow::DOWNRIGHT || down->getArrow(path) == Arrow::DOWNRIGHT) || (right->getArrow(path) == Arrow::DOWN && down->getArrow(path) == Arrow::RIGHT)) {
+				tile->setArrow(Arrow::DOWNRIGHT, path);
 				arrowSet = true;
 			}
 		}
 
 		if (!arrowSet && left != nullptr && up != nullptr) {
-			if ((upleft->getType() == TileType::DEFAULT || upleft->getType() == TileType::ENTRANCE) && up->getType() == TileType::DEFAULT && left->getType() == TileType::DEFAULT && (left->getArrow() == Arrow::UPLEFT || up->getArrow() == Arrow::UPLEFT) || (left->getArrow() == Arrow::UP && up->getArrow() == Arrow::LEFT)) {
-				tile->setArrow(Arrow::UPLEFT);
+			if ((upleft->getType() == TileType::DEFAULT || upleft->getType() == TileType::ENTRANCE) && up->getType() == TileType::DEFAULT && left->getType() == TileType::DEFAULT && (left->getArrow(path) == Arrow::UPLEFT || up->getArrow(path) == Arrow::UPLEFT) || (left->getArrow(path) == Arrow::UP && up->getArrow(path) == Arrow::LEFT)) {
+				tile->setArrow(Arrow::UPLEFT, path);
 				arrowSet = true;
 			}
 		}
 
 		if (!arrowSet && left != nullptr && down != nullptr) {
-			if ((downleft->getType() == TileType::DEFAULT || downleft->getType() == TileType::ENTRANCE) && down->getType() == TileType::DEFAULT && left->getType() == TileType::DEFAULT && (left->getArrow() == Arrow::DOWNLEFT || down->getArrow() == Arrow::DOWNLEFT) || (left->getArrow() == Arrow::DOWN && down->getArrow() == Arrow::LEFT)) {
-				tile->setArrow(Arrow::DOWNLEFT);
+			if ((downleft->getType() == TileType::DEFAULT || downleft->getType() == TileType::ENTRANCE) && down->getType() == TileType::DEFAULT && left->getType() == TileType::DEFAULT && (left->getArrow(path) == Arrow::DOWNLEFT || down->getArrow(path) == Arrow::DOWNLEFT) || (left->getArrow(path) == Arrow::DOWN && down->getArrow(path) == Arrow::LEFT)) {
+				tile->setArrow(Arrow::DOWNLEFT, path);
 				arrowSet = true;
 			}
 		}
@@ -253,58 +287,103 @@ void Grid::createPath() {
 
 		//for (it = neighbors.begin(); it != neighbors.end(); ++it) {
 		//	if (it->second != nullptr) {
-		//		if (!arrowSet && it->second->getArrow() != Arrow::DEFAULT) {
+		//		if (!arrowSet && it->second->getArrow(path) != Arrow::DEFAULT) {
 		//			tile->setArrow(it->first);
 		//			arrowSet = true;
 		//		}
-		//		else if (!it->second->isOccupied() && it->second->getArrow() == Arrow::DEFAULT) {
+		//		else if (!it->second->isOccupied() && it->second->getArrow(path) == Arrow::DEFAULT) {
 		//			enqueueUnique(it->second, tile->getDistanceFromExit());
 		//		}
 		//	}
 		//}
 
-		if (right != nullptr) {
-			if (!arrowSet && right->getArrow() != Arrow::DEFAULT) {
-				tile->setArrow(Arrow::RIGHT);
-				arrowSet = true;
+		if (path == Path::HORIZONTAL) {
+			if (right != nullptr) {
+				if (!arrowSet && right->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::RIGHT, path);
+					arrowSet = true;
+				}
+				else if ((right->getType() == TileType::DEFAULT || right->getType() == TileType::ENTRANCE) && right->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(right, tile->getDistanceFromExit(path));
+				}
 			}
-			else if ((right->getType() == TileType::DEFAULT || right->getType() == TileType::ENTRANCE) && right->getArrow() == Arrow::DEFAULT) {
-				enqueueUnique(right, tile->getDistanceFromExit());
+
+			if (up != nullptr) {
+				if (!arrowSet && up->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::UP, path);
+					arrowSet = true;
+				}
+				else if ((up->getType() == TileType::DEFAULT || up->getType() == TileType::ENTRANCE) && up->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(up, tile->getDistanceFromExit(path));
+				}
+			}
+
+			if (down != nullptr) {
+				if (!arrowSet && down->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::DOWN, path);
+					arrowSet = true;
+				}
+				else if ((down->getType() == TileType::DEFAULT || down->getType() == TileType::ENTRANCE) && down->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(down, tile->getDistanceFromExit(path));
+				}
+			}
+
+			if (left != nullptr) {
+				if (!arrowSet && left->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::LEFT, path);
+					arrowSet = true;
+				}
+				else if ((left->getType() == TileType::DEFAULT || left->getType() == TileType::ENTRANCE) && left->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(left, tile->getDistanceFromExit(path));
+				}
 			}
 		}
 
-		if (up != nullptr) {
-			if (!arrowSet && up->getArrow() != Arrow::DEFAULT) {
-				tile->setArrow(Arrow::UP);
-				arrowSet = true;
+		else {
+			if (down != nullptr) {
+				if (!arrowSet && down->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::DOWN, path);
+					arrowSet = true;
+				}
+				else if ((down->getType() == TileType::DEFAULT || down->getType() == TileType::ENTRANCE) && down->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(down, tile->getDistanceFromExit(path));
+				}
 			}
-			else if ((up->getType() == TileType::DEFAULT || up->getType() == TileType::ENTRANCE) && up->getArrow() == Arrow::DEFAULT) {
-				enqueueUnique(up, tile->getDistanceFromExit());
+
+			if (right != nullptr) {
+				if (!arrowSet && right->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::RIGHT, path);
+					arrowSet = true;
+				}
+				else if ((right->getType() == TileType::DEFAULT || right->getType() == TileType::ENTRANCE) && right->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(right, tile->getDistanceFromExit(path));
+				}
+			}
+
+			if (left != nullptr) {
+				if (!arrowSet && left->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::LEFT, path);
+					arrowSet = true;
+				}
+				else if ((left->getType() == TileType::DEFAULT || left->getType() == TileType::ENTRANCE) && left->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(left, tile->getDistanceFromExit(path));
+				}
+			}
+
+
+			if (up != nullptr) {
+				if (!arrowSet && up->getArrow(path) != Arrow::DEFAULT) {
+					tile->setArrow(Arrow::UP, path);
+					arrowSet = true;
+				}
+				else if ((up->getType() == TileType::DEFAULT || up->getType() == TileType::ENTRANCE) && up->getArrow(path) == Arrow::DEFAULT) {
+					enqueueUnique(up, tile->getDistanceFromExit(path));
+				}
 			}
 		}
 
-		if (down != nullptr) {
-			if (!arrowSet && down->getArrow() != Arrow::DEFAULT) {
-				tile->setArrow(Arrow::DOWN);
-				arrowSet = true;
-			}
-			else if ((down->getType() == TileType::DEFAULT || down->getType() == TileType::ENTRANCE) && down->getArrow() == Arrow::DEFAULT) {
-				enqueueUnique(down, tile->getDistanceFromExit());
-			}
-		}
-
-		if (left != nullptr) {
-			if (!arrowSet && left->getArrow() != Arrow::DEFAULT) {
-				tile->setArrow(Arrow::LEFT);
-				arrowSet = true;
-			}
-			else if ((left->getType() == TileType::DEFAULT || left->getType() == TileType::ENTRANCE) && left->getArrow() == Arrow::DEFAULT) {
-				enqueueUnique(left, tile->getDistanceFromExit());
-			}
-		}
-
-		if (tile->getArrow() == Arrow::UPRIGHT || tile->getArrow() == Arrow::UPLEFT || tile->getArrow() == Arrow::DOWNLEFT || tile->getArrow() == Arrow::DOWNRIGHT) {
-			tile->setDistanceFromExit(tile->getDistanceFromExit() - 1);
+		if (tile->getArrow(path) == Arrow::UPRIGHT || tile->getArrow(path) == Arrow::UPLEFT || tile->getArrow(path) == Arrow::DOWNLEFT || tile->getArrow(path) == Arrow::DOWNRIGHT) {
+			tile->setDistanceFromExit(tile->getDistanceFromExit(path) - 1, path);
 		}
 
 		fifoStack.pop();
@@ -312,11 +391,17 @@ void Grid::createPath() {
 	}
 }
 
-void Grid::visualizePath() {
+void Grid::createPaths() {
+	createPath(Path::HORIZONTAL);
+	createPath(Path::VERTICAL);
+}
+
+
+void Grid::visualizePath(Path path) {
 	for (unsigned int i = 0; i < m_rows; ++i) {
 		for (unsigned int j = 0; j < m_cols; ++j) {
 			char symbol;
-			switch (m_tiles[i][j].getArrow()) {
+			switch (m_tiles[i][j].getArrow(path)) {
 			case Arrow::UP:
 				symbol = '^';
 				break;
@@ -367,6 +452,11 @@ void Grid::visualizePath() {
 	//std::cout << "\n\n";
 }
 
+void Grid::visualizePaths() {
+	visualizePath(Path::HORIZONTAL);
+	visualizePath(Path::VERTICAL);
+}
+
 void Grid::visualizeOccupy() {
 	for (unsigned int i = 0; i < m_rows; ++i) {
 		for (unsigned int j = 0; j < m_cols; ++j) {
@@ -408,18 +498,30 @@ bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 			}
 		}
 
-		resetPath();
-		createPath();
+		resetPaths();
+		createPaths();
 
 		for (auto* tile : entranceTiles[Path::HORIZONTAL]) {
-			if (tile->getArrow() == Arrow::DEFAULT) {
+			if (tile->getArrow(Path::HORIZONTAL) == Arrow::DEFAULT) {
 				for (int i = row; i <= row + 1; ++i) {
 					for (int j = col; j <= col + 1; ++j) {
 						m_tiles[i][j].setType(TileType::DEFAULT);
 					}
 				}
-				resetPath();
-				createPath();
+				resetPaths();
+				createPaths();
+				return false;
+			}
+		}
+		for (auto* tile : entranceTiles[Path::VERTICAL]) {
+			if (tile->getArrow(Path::VERTICAL) == Arrow::DEFAULT) {
+				for (int i = row; i <= row + 1; ++i) {
+					for (int j = col; j <= col + 1; ++j) {
+						m_tiles[i][j].setType(TileType::DEFAULT);
+					}
+				}
+				resetPaths();
+				createPaths();
 				return false;
 			}
 		}

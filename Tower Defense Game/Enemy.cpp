@@ -26,29 +26,32 @@ void Enemy::move()
 void Enemy::moveCase(Tile* tile)
 {
 	//if (tile != nullptr && tile->getBounds().contains(this->sprite.getPosition())) {
-	if (tile != nullptr && this->getPosition() == tile->getPosition()) {
+	if (tile != nullptr && this->getPosition(true) == tile->getPosition()) {
 		this->currentTile->occupyDec();
 		this->currentTile = tile;
 		
-		Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow()];
+		Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
 
 		if(nextObjectiveTile != nullptr)
-			this->currentTile->getNeighbors()[this->currentTile->getArrow()]->occupyInc();
+			this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
 
-		this->currentArrow = this->currentTile->getArrow();
-		this->direction = this->currentTile->getMoveDirection();
+		this->currentArrow = this->currentTile->getArrow(this->path);
+		this->direction = utils::getArrowDirection(this->currentTile->getArrow(this->path));
 	}
 }
 
-Enemy::Enemy(Tile* tile, sf::Vector2f spawnOffset) {
+Enemy::Enemy(Tile* tile, sf::Vector2f spawnOffset, Path path) {
 	initSprite();
 	this->hp = 300;
 	this->dead = false;
 	this->currentTile = tile;
 	this->currentTile->occupyInc();
 	this->sprite.setPosition(this->currentTile->getPosition() + spawnOffset);
+	this->path = path;
+	if (this->path == Path::HORIZONTAL) this->direction = sf::Vector2f(1.f, 0.f);
+	else if (this->path == Path::VERTICAL) this->direction = sf::Vector2f(0.f, 1.f);
+
 	this->currentArrow = Arrow::DEFAULT;
-	this->direction = sf::Vector2f(1.f, 0.f);
 	this->moveSpeed = 1.f;
 	this->reachedEntrance = false;
 }
@@ -58,9 +61,15 @@ Enemy::~Enemy()
 	std::cout << "called destructor\n\n";
 }
 
-sf::Vector2f Enemy::getPosition()
+sf::Vector2f Enemy::getPosition(bool ignoreOffset)
 {
+	if (ignoreOffset) return this->getPosition() - this->getPositionOffset();
 	return this->sprite.getPosition();
+}
+
+sf::Vector2f Enemy::getPositionOffset()
+{
+	return this->positionOffset;
 }
 
 sf::FloatRect Enemy::getBounds()
@@ -93,6 +102,12 @@ bool Enemy::didReachedEntrance()
 	return this->reachedEntrance;
 }
 
+void Enemy::setPositionOffset(sf::Vector2f offset)
+{
+	this->positionOffset = offset;
+	this->sprite.setPosition(this->sprite.getPosition() + offset);
+}
+
 void Enemy::setDirection(sf::Vector2f direction)
 {
 	this->direction = direction;
@@ -120,17 +135,20 @@ void Enemy::die()
 
 void Enemy::update()
 {
+	sf::Vector2f dir = this->getDirection();
+	this->sprite.setRotation(utils::getRotation(dir));
+
 	if (!this->didReachedEntrance()) {
 		this->sprite.move(this->direction * moveSpeed);
-		if (this->getCurrentTile()->getPosition() == this->getPosition()) {
+		if (this->getCurrentTile()->getPosition() == this->getPosition(true)) {
 			this->reachedEntrance = true;
-			this->currentArrow = this->currentTile->getArrow();
-			this->direction = this->currentTile->getMoveDirection();
+			this->currentArrow = this->currentTile->getArrow(this->path);
+			this->direction = utils::getArrowDirection(this->currentTile->getArrow(this->path));
 
-			Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow()];
+			Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
 
 			if (nextObjectiveTile != nullptr)
-				this->currentTile->getNeighbors()[this->currentTile->getArrow()]->occupyInc();
+				this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
 		}
 	}
 	else {

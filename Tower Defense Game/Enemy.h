@@ -10,10 +10,12 @@ class Enemy
 private:
 	sf::Sprite sprite;
 	sf::Texture texture;
+	sf::Vector2f positionOffset;
 
 	int hp;
 	float moveSpeed;
 	bool dead;
+	Path path;
 	Arrow currentArrow;
 	sf::Vector2f direction;
 	Tile* currentTile;
@@ -26,10 +28,11 @@ private:
 
 
 public:
-	Enemy(Tile* tile, sf::Vector2f spawnOffset);
+	Enemy(Tile* tile, sf::Vector2f spawnOffset, Path path);
 	virtual ~Enemy();
 
-	sf::Vector2f getPosition();
+	sf::Vector2f getPosition(bool ignoreOffset=false);
+	sf::Vector2f getPositionOffset();
 	sf::FloatRect getBounds();
 	int getHp();
 	bool isDead();
@@ -37,6 +40,7 @@ public:
 	Tile* getCurrentTile();
 	bool didReachedEntrance();
 
+	void setPositionOffset(sf::Vector2f offset);
 	void setDirection(sf::Vector2f direction);
 	void setCurrentTile(Tile* tile);
 
