@@ -8,6 +8,7 @@
 #include <queue>
 #include <fstream>
 #include <iomanip>
+#include <mutex>
 
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
@@ -19,6 +20,7 @@
 #include <cstdlib>
 
 #include "Properties.h"
+#include "PausableClock.hpp"
 
 enum class Arrow {
     DEFAULT, UP, RIGHT, DOWN, LEFT, UPRIGHT, UPLEFT, DOWNRIGHT, DOWNLEFT

@@ -3,9 +3,6 @@
 #include "include.h"
 #include "Tile.h"
 #include "Tower.h"
-#include "Properties.h"
-
-
 
 class Grid {
 private:

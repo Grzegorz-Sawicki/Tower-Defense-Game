@@ -42,7 +42,7 @@ void Enemy::moveCase(Tile* tile)
 
 Enemy::Enemy(Tile* tile, sf::Vector2f spawnOffset, Path path) {
 	initSprite();
-	this->hp = 300;
+	this->hp = 20;
 	this->dead = false;
 	this->currentTile = tile;
 	this->currentTile->occupyInc();
@@ -123,36 +123,42 @@ void Enemy::setCurrentTile(Tile* tile)
 void Enemy::takeDamage(int damage)
 {
 	this->hp -= damage;
-	if (this->hp <= 0) {
+	if (!this->dead && this->hp <= 0) {
 		this->die();
 	}
 }
 
 void Enemy::die()
 {
+	this->currentTile->occupyDec();
+	Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
+	if (nextObjectiveTile != nullptr)
+		nextObjectiveTile->occupyDec();
 	this->dead = true;
 }
 
 void Enemy::update()
 {
-	sf::Vector2f dir = this->getDirection();
-	this->sprite.setRotation(utils::getRotation(dir));
+	if (!dead) {
+		sf::Vector2f dir = this->getDirection();
+		this->sprite.setRotation(utils::getRotation(dir));
 
-	if (!this->didReachedEntrance()) {
-		this->sprite.move(this->direction * moveSpeed);
-		if (this->getCurrentTile()->getPosition() == this->getPosition(true)) {
-			this->reachedEntrance = true;
-			this->currentArrow = this->currentTile->getArrow(this->path);
-			this->direction = utils::getArrowDirection(this->currentTile->getArrow(this->path));
+		if (!this->didReachedEntrance()) {
+			this->sprite.move(this->direction * moveSpeed);
+			if (this->getCurrentTile()->getPosition() == this->getPosition(true)) {
+				this->reachedEntrance = true;
+				this->currentArrow = this->currentTile->getArrow(this->path);
+				this->direction = utils::getArrowDirection(this->currentTile->getArrow(this->path));
 
-			Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
+				Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
 
-			if (nextObjectiveTile != nullptr)
-				this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
+				if (nextObjectiveTile != nullptr)
+					this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
+			}
 		}
-	}
-	else {
-		this->move();
+		else {
+			this->move();
+		}
 	}
 }
 

@@ -136,7 +136,10 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LevelManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PausableClock.hpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Properties.cpp" />
     <ClCompile Include="TextureManager.cpp" />
@@ -148,6 +151,8 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="include.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelManager.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="TextureManager.hpp" />

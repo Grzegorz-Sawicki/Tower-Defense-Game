@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include.h"
-#include "Properties.h"
 
 class Tile {
 private:

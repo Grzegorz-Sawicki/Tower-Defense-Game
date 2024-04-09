@@ -14,7 +14,7 @@ void Grid::moveToCorrectPlace()
 	{
 		for (size_t j = 0; j < m_cols; j++)
 		{
-			m_tiles[i][j].setPosition(m_tiles[i][j].getPosition() + sf::Vector2f(60.f, 60.f));
+			m_tiles[i][j].setPosition(m_tiles[i][j].getPosition() + sf::Vector2f(Properties::gridLeftOffset, Properties::gridTopOffset));
 		}
 	}
 }
@@ -29,10 +29,10 @@ Grid::Grid() {
 		row.reserve(m_cols);
 		for (unsigned int j = 0; j < m_cols; ++j) {
 			if (i == 0 || i == m_rows - 1 || j == 0 || j == m_cols - 1) {
-				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, sf::Color(150, 150, 150, 100), TileType::WALL);
+				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, Properties::colorGridWall, TileType::WALL);
 			}
 			else {
-				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, sf::Color(0, 0, 255, 100), TileType::DEFAULT);
+				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, Properties::colorGridTile, TileType::DEFAULT);
 			}
 		}
 		m_tiles.push_back(std::move(row));
@@ -52,16 +52,8 @@ Grid::Grid() {
 	{
 		Tile* tmp = &m_tiles[i + 9][0];
 		tmp->setType(TileType::ENTRANCE);
-		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+		tmp->setBaseColor(Properties::colorGridTile);
 		entranceTiles[Path::HORIZONTAL].emplace_back(tmp);
-	}
-	//VERTICAL
-	for (size_t i = 0; i < 8; i++)
-	{
-		Tile* tmp = &m_tiles[0][i+10];
-		tmp->setType(TileType::ENTRANCE);
-		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
-		entranceTiles[Path::VERTICAL].emplace_back(tmp);
 	}
 
 	//set exit tiles
@@ -70,27 +62,36 @@ Grid::Grid() {
 	{
 		Tile* tmp = &m_tiles[11 - i][m_cols - 1];
 		tmp->setType(TileType::EXIT);
-		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+		tmp->setBaseColor(Properties::colorGridTile);
 		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
 
 		tmp = &m_tiles[12 + i][m_cols - 1];
 		tmp->setType(TileType::EXIT);
-		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+		tmp->setBaseColor(Properties::colorGridTile);
 		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
 	}
 	//VERTICAL
-	for (size_t i = 0; i < 4; i++)
-	{
-		Tile* tmp = &m_tiles[m_rows - 1][13-i];
-		tmp->setType(TileType::EXIT);
-		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
-		exitTiles[Path::VERTICAL].emplace_back(tmp);
 
-		tmp = &m_tiles[m_rows - 1][14+i];
-		tmp->setType(TileType::EXIT);
-		tmp->setBaseColor(sf::Color(0, 0, 255, 100));
-		exitTiles[Path::VERTICAL].emplace_back(tmp);
-	}
+	//for (size_t i = 0; i < 8; i++)
+	//{
+	//	Tile* tmp = &m_tiles[0][i + 10];
+	//	tmp->setType(TileType::ENTRANCE);
+	//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+	//	entranceTiles[Path::VERTICAL].emplace_back(tmp);
+	//}
+
+	//for (size_t i = 0; i < 4; i++)
+	//{
+	//	Tile* tmp = &m_tiles[m_rows - 1][13-i];
+	//	tmp->setType(TileType::EXIT);
+	//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+	//	exitTiles[Path::VERTICAL].emplace_back(tmp);
+
+	//	tmp = &m_tiles[m_rows - 1][14+i];
+	//	tmp->setType(TileType::EXIT);
+	//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+	//	exitTiles[Path::VERTICAL].emplace_back(tmp);
+	//}
 
 	this->moveToCorrectPlace();
 }
@@ -111,9 +112,8 @@ void Grid::draw(sf::RenderWindow& window) {
 void Grid::handleMouseMove(const sf::Vector2f& mousePos)
 {
 	// Calculate the index of the tile that the mouse is currently over
-	//TEMP NUMBERS 60 = arbitrary offset 
-	int col = static_cast<int>((Properties::tileSize / 2 - 60 + mousePos.x - Properties::tileSize / 2) / m_tileSize);
-	int row = static_cast<int>((Properties::tileSize / 2 - 60 + mousePos.y - Properties::tileSize / 2) / m_tileSize);
+	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
+	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
 
 	// Reset the color of all tiles
 	for (unsigned int i = 0; i < m_rows; ++i) {
@@ -203,7 +203,7 @@ void Grid::resetPath(Path path) {
 
 void Grid::resetPaths() {
 	resetPath(Path::HORIZONTAL);
-	resetPath(Path::VERTICAL);
+	//resetPath(Path::VERTICAL);
 }
 
 void Grid::createPath(Path path) {
@@ -393,47 +393,47 @@ void Grid::createPath(Path path) {
 
 void Grid::createPaths() {
 	createPath(Path::HORIZONTAL);
-	createPath(Path::VERTICAL);
+	//createPath(Path::VERTICAL);
 }
 
 
 void Grid::visualizePath(Path path) {
-	for (unsigned int i = 0; i < m_rows; ++i) {
-		for (unsigned int j = 0; j < m_cols; ++j) {
-			char symbol;
-			switch (m_tiles[i][j].getArrow(path)) {
-			case Arrow::UP:
-				symbol = '^';
-				break;
-			case Arrow::RIGHT:
-				symbol = '>';
-				break;
-			case Arrow::LEFT:
-				symbol = '<';
-				break;
-			case Arrow::DOWN:
-				symbol = 'v';
-				break;
-			case Arrow::UPRIGHT:
-				symbol = 'n';
-				break;
-			case Arrow::DOWNRIGHT:
-				symbol = 'u';
-				break;
-			case Arrow::UPLEFT:
-				symbol = '3';
-				break;
-			case Arrow::DOWNLEFT:
-				symbol = 'e';
-				break;
-			default:
-				symbol = ' ';
-			}
-			std::cout << symbol;
-		}
-		std::cout << "\n";
-	}
-	std::cout << "\n\n";
+	//for (unsigned int i = 0; i < m_rows; ++i) {
+	//	for (unsigned int j = 0; j < m_cols; ++j) {
+	//		char symbol;
+	//		switch (m_tiles[i][j].getArrow(path)) {
+	//		case Arrow::UP:
+	//			symbol = '^';
+	//			break;
+	//		case Arrow::RIGHT:
+	//			symbol = '>';
+	//			break;
+	//		case Arrow::LEFT:
+	//			symbol = '<';
+	//			break;
+	//		case Arrow::DOWN:
+	//			symbol = 'v';
+	//			break;
+	//		case Arrow::UPRIGHT:
+	//			symbol = 'n';
+	//			break;
+	//		case Arrow::DOWNRIGHT:
+	//			symbol = 'u';
+	//			break;
+	//		case Arrow::UPLEFT:
+	//			symbol = '3';
+	//			break;
+	//		case Arrow::DOWNLEFT:
+	//			symbol = 'e';
+	//			break;
+	//		default:
+	//			symbol = ' ';
+	//		}
+	//		std::cout << symbol;
+	//	}
+	//	std::cout << "\n";
+	//}
+	//std::cout << "\n\n";
 
 	//for (unsigned int i = 0; i < m_rows; ++i) {
 	//	for (unsigned int j = 0; j < m_cols; ++j) {
@@ -453,8 +453,9 @@ void Grid::visualizePath(Path path) {
 }
 
 void Grid::visualizePaths() {
+	visualizeOccupy();
 	visualizePath(Path::HORIZONTAL);
-	visualizePath(Path::VERTICAL);
+	//visualizePath(Path::VERTICAL);
 }
 
 void Grid::visualizeOccupy() {
@@ -471,14 +472,14 @@ bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 {
 
 	// Calculate the index of the tile that the mouse is currently over
-	int col = static_cast<int>((9 - 60 + mousePos.x - m_tileSize / 2) / m_tileSize);
+	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
 
 	// Check if mousePos outside grid
 	if (col >= m_cols - 1)
 		return false;
 
 	// Calculate the index of the tile that the mouse is currently over
-	int row = static_cast<int>((9 - 60 + mousePos.y - m_tileSize / 2) / m_tileSize);
+	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
 
 	// Check if mousePos outside grid
 	if (row >= m_rows - 1)
@@ -533,8 +534,8 @@ bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 Tower* Grid::placeTower(const sf::Vector2i& mousePos)
 {
 	// Calculate the index of the tile that the mouse is currently over
-	int col = static_cast<int>((9 - 60 + mousePos.x - m_tileSize / 2) / m_tileSize);
-	int row = static_cast<int>((9 - 60 + mousePos.y - m_tileSize / 2) / m_tileSize);
+	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
+	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
 
 	int posX = m_tiles[row][col].getBounds().left + m_tiles[row][col].getBounds().width;
 	int posY = m_tiles[row][col].getBounds().top + m_tiles[row][col].getBounds().height;
