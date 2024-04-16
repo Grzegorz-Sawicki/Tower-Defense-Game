@@ -1,14 +1,14 @@
 #include "Tower.h"
 
-void Tower::initSprites()
+void Tower::initSprites(json texture)
 {
 	//base
-	this->spriteBase.setTexture(TextureManager::instance().getTexture("Textures/tower_basic_base.png"));
+	this->spriteBase.setTexture(TextureManager::instance().getTexture("Textures/tower_base.png"));
 	this->spriteBase.setPosition(this->posX, this->posY);
 	this->spriteBase.setOrigin(this->spriteBase.getGlobalBounds().width / 2, this->spriteBase.getGlobalBounds().height / 2);
 
 	//barrel
-	this->spriteBarrel.setTexture(TextureManager::instance().getTexture("Textures/tower_basic_barrel.png"));
+	this->spriteBarrel.setTexture(TextureManager::instance().getTexture(texture));
 	this->spriteBarrel.setPosition(this->posX, this->posY);
 	this->spriteBarrel.setOrigin(this->spriteBarrel.getGlobalBounds().width / 2, this->spriteBarrel.getGlobalBounds().height / 2);
 }
@@ -26,7 +26,9 @@ void Tower::initRadiusCircle()
 void Tower::shoot(Enemy* enemy)
 {
 	std::cout << "Tower shoots at enemy!" << std::endl;
-	projectiles.emplace_back(new Projectile(this->spriteBase.getPosition().x, this->spriteBase.getPosition().y, enemy));
+	projectiles.emplace_back(new Projectile(
+		this->enemies, this->spriteBase.getPosition().x, this->spriteBase.getPosition().y, enemy, this->type, this->damage, this->projectileSpeed, this->effects
+	));
 }
 
 void Tower::rotateTowardsEnemy(Enemy* enemy)
@@ -39,15 +41,77 @@ void Tower::rotateTowardsEnemy(Enemy* enemy)
 	this->spriteBarrel.setRotation(angle);
 }
 
-Tower::Tower(int posX, int posY) : posX(posX), posY(posY)
+Tower::Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType type) : enemies(enemies), posX(posX), posY(posY), type(type)
 {
-	this->state = PASSIVE;
-	this->initSprites();
+	std::ifstream file(Properties::jsonTowersFileName);
+	if (!file.is_open()) {
+		std::cerr << "Failed to open JSON file." << std::endl;
+		system("pause");
+	}
 
-	this->range = 100;
+	json jsonData;
+	try {
+		file >> jsonData;
+	}
+	catch (json::parse_error& e) {
+		std::cerr << "Parse error: " << e.what() << std::endl;
+		system("pause");
+	}
+
+	file.close();
+
+	json towers = jsonData["towers"];
+
+	json tower = towers[static_cast<int>(type)];
+	this->damage = tower["damage"];
+	this->cost = tower["cost"];
+	this->range = tower["range"];
+	this->shootSpeed = tower["shootSpeed"];
+	this->speedStr = tower["speedStr"];
+	this->projectileSpeed = tower["projectileSpeed"];
+
+	this->effects = tower["effects"];
+
+	//TOWER EFFECTS:
+	/*
+		slow - float time, power
+		stun - float time
+		aoe - float radius
+
+		anti-air
+		multi-shot - int count
+	*/
+
+	for (json effect : this->effects) {
+		if (effect["name"] == "aoe") {
+			this->isAoe = true;
+			this->aoeRange = effect["range"];
+		}
+		 //give projectiles effects table in argument
+		else if (effect["name"] == "slow") {
+			this->isSlow = true;
+			this->slowValue = effect["value"];
+			this->slowLength = effect["length"];
+		}
+		else if (effect["name"] == "stun") {
+			this->isStun = true;
+			this->stunChance = effect["chance"];
+			this->stunLength = effect["length"];
+		}
+		else if (effect["name"] == "bash") {
+			this->isBash = true;
+		}
+	}
+
+	this->initSprites(tower["texture"]);
+
+
+	//this->initSprites();
+
+	//this->range = 100;
 	this->initRadiusCircle();
 
-	this->shootSpeed = 1.f;
+	//this->shootSpeed = 1.f;
 	this->shootInterval = sf::seconds(1.f / shootSpeed);
 	this->shootTimer = this->shootInterval;
 	this->targetEnemy = nullptr;
@@ -70,14 +134,24 @@ sf::Vector2f Tower::getPosition()
 	return this->spriteBase.getPosition();
 }
 
-void Tower::update(const std::vector<Enemy*>& enemies)
+const std::vector<Enemy*>& Tower::getEnemies()
+{
+	return this->enemies;
+}
+
+TowerType Tower::getType()
+{
+	return this->type;
+}
+
+void Tower::update()
 {
 	if (this->targetEnemy != nullptr && this->targetEnemy->isDead()) {
 		this->targetEnemyDead = true;
 	}
 
 	if (this->shootTimer >= this->shootInterval) {
-		for (auto& enemy : enemies) {
+		for (auto& enemy : this->enemies) {
 			float distance = std::sqrt(std::pow(enemy->getPosition().x - this->getPosition().x, 2) + std::pow(enemy->getPosition().y - this->getPosition().y, 2));
 			if (distance <= this->range) {
 				this->enemyDetected = true;
@@ -85,7 +159,7 @@ void Tower::update(const std::vector<Enemy*>& enemies)
 				this->targetEnemyDead = false;
 
 				if (this->shootTimer >= this->shootInterval) {
-					shoot(enemy);
+					this->shoot(enemy);
 					this->shootTimer = sf::Time::Zero;
 				}
 				if (this->enemyDetected) break;
@@ -93,7 +167,7 @@ void Tower::update(const std::vector<Enemy*>& enemies)
 		}
 	}
 
-	if(this->targetEnemy != nullptr && !this->targetEnemyDead)
+	if(this->targetEnemy != nullptr && !this->targetEnemyDead && !this->isBash)
 		this->rotateTowardsEnemy(this->targetEnemy);
 
 	this->updateProjectiles();
@@ -121,7 +195,10 @@ void Tower::render(sf::RenderTarget* target)
 	target->draw(this->spriteBase);
 	target->draw(this->spriteBarrel);
 	target->draw(this->radiusCircle);
+}
 
+void Tower::renderProjectiles(sf::RenderTarget* target)
+{
 	for (auto* projectile : this->projectiles)
 	{
 		projectile->render(target);

@@ -1,0 +1,116 @@
+{
+  "towers": [
+    {
+      "name": "Pellet",
+      "damage": 10,
+      "default_damage": 10,
+      "cost": 5,
+      "range": 60,
+      "shootSpeed": 1.0,
+      "speedStr": "slow",
+      "projectileSpeed": 2.0,
+      "effects": [],
+      "texture": "textures/tower_pellet_barrel.png"
+    },
+    {
+      "name": "Squirt",
+      "damage": 5,
+      "cost": 15,
+      "range": 70,
+      "shootSpeed": 4.0,
+      "speedStr": "fast",
+      "projectileSpeed": 2.0,
+      "effects": [],
+      "texture": "textures/tower_squirt_barrel.png"
+    },
+    {
+      "name": "Dart",
+      "damage": 8,
+      "cost": 20,
+      "range": 90,
+      "shootSpeed": 1,
+      "speedStr": "very slow",
+      "projectileSpeed": 1.5,
+
+      "effects": [
+        {
+          "name": "aoe",
+          "range": 50.0
+        }
+      ],
+
+      "texture": "textures/tower_dart_barrel.png"
+    },
+    {
+      "name": "Swarm",
+      "damage": 20,
+      "cost": 50,
+      "range": 60,
+      "shootSpeed": 2,
+      "speedStr": "average",
+      "projectileSpeed": 2,
+
+      "effects": [
+        {
+          "name": "anti-air"
+        },
+        {
+          "name": "multi-shot",
+          "amount": 4
+        }
+      ],
+
+      "texture": "textures/tower_swarm_barrel.png"
+    },
+    {
+      "name": "Frost",
+      "damage": 2,
+      "default_damage": 10,
+      "cost": 50,
+      "range": 50,
+      "shootSpeed": 2.0,
+      "speedStr": "slow",
+      "projectileSpeed": 2,
+
+      "effects": [
+        {
+          "name": "aoe",
+          "range": 20.0
+        },
+        {
+          "name": "slow",
+          "value": 0.4,
+          "length": 2.0
+        }
+      ],
+
+      "texture": "textures/tower_frost_barrel.png"
+    },
+    {
+      "name": "Bash",
+      "damage": 1,
+      "cost": 30,
+      "range": 80,
+      "shootSpeed": 5,
+      "speedStr": "slow",
+      "projectileSpeed": 2,
+
+      "effects": [
+        {
+          "name": "aoe",
+          "range": 100.0
+        },
+        {
+          "name": "stun",
+          "chance": 0.25,
+          "length": 2.0
+        },
+        {
+          "name": "bash"
+        }
+      ],
+
+      "texture": "textures/tower_bash_barrel.png"
+    }
+  ]
+}

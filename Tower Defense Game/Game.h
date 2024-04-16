@@ -39,6 +39,9 @@ private:
 	sf::Sprite muteButtonSprite;
 	sf::Texture muteButtonTexture;
 
+	std::map<TowerType, sf::Sprite*> towerButtons;
+	std::map<TowerType, sf::Sprite*> towerBases;
+
 	std::vector <sf::Text*> texts;
 	sf::Font font;
 	sf::Text* textTime;
@@ -63,6 +66,8 @@ private:
 	unsigned score;
 
 	bool paused;
+	bool placeMode;
+	TowerType placingTower;
 
 	//Functions
 	void initWindow();
@@ -71,6 +76,8 @@ private:
 	void initUI();
 	void initVariables();
 	void initGrid();
+
+	bool mouseOnSprite(sf::Sprite sprite);
 
 	sf::Clock clock;
 
@@ -82,6 +89,8 @@ public:
 
 	//Functions
 	void run();
+
+	std::vector<Enemy*>& getEnemies();
 
 	void updatePollEvents();
 	void update();

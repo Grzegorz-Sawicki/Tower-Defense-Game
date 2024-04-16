@@ -5,15 +5,14 @@
 #include "Projectile.h"
 #include "TextureManager.hpp"
 #include "utils.hpp"
-
-enum TowerState
-{
-	PASSIVE=0, ACTIVE, ELEM_COUNT
-};
+#include "AoE.h"
 
 class Tower
 {
 private:
+	const std::vector<Enemy*>& enemies;
+	json effects;
+
 	sf::Sprite spriteBase;
 	sf::Sprite spriteBarrel;
 	sf::Texture texture;
@@ -21,11 +20,27 @@ private:
 	sf::CircleShape radiusCircle;
 
 	std::vector<Projectile*> projectiles;
+	TowerType type;
 
 	int posX;
 	int posY;
+
+	int damage;
+	int cost;
 	int range;
-	int shootSpeed;
+	double shootSpeed;
+	std::string speedStr;
+	double projectileSpeed;
+
+	bool isAoe;
+	float aoeRange;
+	bool isSlow;
+	float slowValue;
+	float slowLength;
+	bool isStun;
+	float stunChance;
+	float stunLength;
+	bool isBash;
 
 	Enemy* targetEnemy;
 	bool targetEnemyDead;
@@ -35,24 +50,24 @@ private:
 	sf::Time shootTimer;
 	sf::Clock clock;
 
-	TowerState state;
-
-	void initSprites();
+	void initSprites(json texture);
 	void initRadiusCircle();
 	void shoot(Enemy* enemy);
 	void rotateTowardsEnemy(Enemy* enemy);
 
 public:
-	Tower(int posX, int posY);
+	Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType type);
 	virtual ~Tower();
 
 	sf::FloatRect getBounds();
 	sf::Vector2f getPosition();
+	const std::vector<Enemy*>& getEnemies();
+	TowerType getType();
 
 	//Functions
 
-	void update(const std::vector<Enemy*>& enemies);
+	void update();
 	void updateProjectiles();
 	void render(sf::RenderTarget* target);
+	void renderProjectiles(sf::RenderTarget* target);
 };
-

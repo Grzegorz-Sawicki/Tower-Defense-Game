@@ -19,8 +19,7 @@ void Grid::moveToCorrectPlace()
 	}
 }
 
-Grid::Grid() {
-
+Grid::Grid(std::vector<Enemy*>& enemies) : enemies(enemies) {
 	// Initialize tiles
 	m_tiles.reserve(m_rows);
 
@@ -53,6 +52,7 @@ Grid::Grid() {
 		Tile* tmp = &m_tiles[i + 9][0];
 		tmp->setType(TileType::ENTRANCE);
 		tmp->setBaseColor(Properties::colorGridTile);
+		tmp->resetColor();
 		entranceTiles[Path::HORIZONTAL].emplace_back(tmp);
 	}
 
@@ -63,11 +63,13 @@ Grid::Grid() {
 		Tile* tmp = &m_tiles[11 - i][m_cols - 1];
 		tmp->setType(TileType::EXIT);
 		tmp->setBaseColor(Properties::colorGridTile);
+		tmp->resetColor();
 		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
 
 		tmp = &m_tiles[12 + i][m_cols - 1];
 		tmp->setType(TileType::EXIT);
 		tmp->setBaseColor(Properties::colorGridTile);
+		tmp->resetColor();
 		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
 	}
 	//VERTICAL
@@ -96,8 +98,8 @@ Grid::Grid() {
 	this->moveToCorrectPlace();
 }
 
-Grid& Grid::getInstance() {
-	static Grid instance;
+Grid& Grid::getInstance(std::vector<Enemy*>& enemies) {
+	static Grid instance(enemies);
 	return instance;
 }
 
@@ -531,7 +533,7 @@ bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 	return true;
 }
 
-Tower* Grid::placeTower(const sf::Vector2i& mousePos)
+Tower* Grid::placeTower(const sf::Vector2i& mousePos, TowerType type)
 {
 	// Calculate the index of the tile that the mouse is currently over
 	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
@@ -548,5 +550,5 @@ Tower* Grid::placeTower(const sf::Vector2i& mousePos)
 		}
 	}
 
-	return new Tower(posX, posY);
+	return new Tower(enemies, posX, posY, type);
 }

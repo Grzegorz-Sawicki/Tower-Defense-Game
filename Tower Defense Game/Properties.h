@@ -10,11 +10,15 @@ struct Properties
 	static int gridTopOffset;
 	static int gridLeftOffset;
 
+	static sf::Vector2f towerSizeX;
+
 	static sf::Vector2f buttonPausePosition;
 	static sf::Vector2f buttonResetPosition;
 	static sf::Vector2f buttonLevelPosition;
 	static sf::Vector2f buttonGridPosition;
 	static sf::Vector2f buttonMutePosition;
+	static sf::Vector2f buttonTowerPosition;
+	static sf::Vector2f buttonTowerOffset;
 
 	static int UIValueBoxHeight;
 	static int UIButtonBoxWidth;
@@ -23,6 +27,8 @@ struct Properties
 	static sf::Color colorGridWall;
 	static sf::Color colorGridTile;
 	static sf::Color colorUIBox;
+	static sf::Color colorEnemyHealthBar;
+	static sf::Vector2f sizeEnemyHealthBar;
 
 	static float tileSize;
 	static int gridTileNumHorizontal;
@@ -41,6 +47,8 @@ struct Properties
 
 	static std::string textPause;
 	static sf::Vector2f textPausePosition;
+
+	static std::string jsonTowersFileName;
 };
 
 

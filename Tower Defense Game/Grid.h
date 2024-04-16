@@ -15,15 +15,18 @@ private:
     static std::map<Path, std::vector<Tile*>> entranceTiles;
     static std::map<Path, std::vector<Tile*>> exitTiles;
 
+    const std::vector<Enemy*>& enemies;
+
     static void moveToCorrectPlace();
 
 public:
+    Grid(std::vector<Enemy*>& enemies);
     // Deleted copy constructor and assignment operator to prevent cloning
     Grid(const Grid&) = delete;
     Grid& operator=(const Grid&) = delete;
 
     // Static method to access the singleton instance
-    static Grid& getInstance();
+    static Grid& getInstance(std::vector<Enemy*>& enemies);
 
     static void draw(sf::RenderWindow& window);
 
@@ -43,7 +46,7 @@ public:
     static void visualizeOccupy();
 
     static bool canPlaceTower(const sf::Vector2i& mousePos);
-    static Tower* placeTower(const sf::Vector2i& mousePos);
+    Tower* placeTower(const sf::Vector2i& mousePos, TowerType type);
 };
 
 

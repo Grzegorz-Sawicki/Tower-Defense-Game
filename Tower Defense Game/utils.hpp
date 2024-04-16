@@ -70,4 +70,23 @@ namespace utils
         return directionValue;
     }
 
+    inline std::string towerToString(TowerType type) {
+        switch (type) {
+        case TowerType::PELLET:
+            return "pellet";
+        case TowerType::SQUIRT:
+            return "squirt";
+        case TowerType::DART:
+            return "dart";
+        case TowerType::SWARM:
+            return "swarm";
+        case TowerType::FROST:
+            return "frost";
+        case TowerType::BASH:
+            return "bash";
+        default:
+            return "pellet";
+        }
+    }
+
 }

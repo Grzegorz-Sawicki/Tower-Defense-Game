@@ -15,6 +15,10 @@
 #include "SFML/Audio.hpp"
 #include "SFML/Graphics.hpp"
 
+#include "json.hpp"
+
+using json = nlohmann::json;
+
 //for named pipe
 #include <windows.h>
 #include <cstdlib>
@@ -32,4 +36,12 @@ enum class TileType {
 
 enum class Path {
     HORIZONTAL, VERTICAL
+};
+
+enum class EnemyType {
+    DEFAULT, GROUP, IMMUNE, FAST, SPAWN, SPAWNED, FLYING, BOSS
+};
+
+enum class TowerType {
+    PELLET, SQUIRT, DART, SWARM, FROST, BASH, ELEM_COUNT
 };

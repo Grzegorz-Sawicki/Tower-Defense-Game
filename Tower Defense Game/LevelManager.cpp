@@ -10,8 +10,12 @@ LevelManager::LevelManager(std::vector<Enemy*> &enemies)
 	this->canSpawn = false;
 	this->currentLevel = 0;
 
-	for (int i = 0; i < 50; i++) {
-		levels[i] = new Level(enemies, 10, 20);
+	for (int i = 0; i < 50; i+=5) {
+		levels[i] = new Level(enemies, 10, 50, EnemyType::DEFAULT);
+		levels[i+1] = new Level(enemies, 10, 50, EnemyType::GROUP);
+		levels[i+2] = new Level(enemies, 10, 50, EnemyType::IMMUNE);
+		levels[i+3] = new Level(enemies, 10, 50, EnemyType::FAST);
+		levels[i+4] = new Level(enemies, 10, 50, EnemyType::FLYING);
 	}
 
 	//levels[0] = new Level(enemies, 10, 20);

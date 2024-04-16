@@ -62,6 +62,20 @@ void Game::initUI()
 	this->muteButtonSprite.setTexture(this->muteButtonTexture);
 	this->muteButtonSprite.setPosition(Properties::buttonMutePosition);
 
+	for (int i = 0; i < static_cast<int>(TowerType::ELEM_COUNT); i++) {
+		TowerType type = static_cast<TowerType>(i);
+
+		sf::Sprite* tmpTower = new sf::Sprite(TextureManager::instance().getTexture(static_cast<std::string>("Textures/tower_") + utils::towerToString(type) + "_barrel.png"));
+		sf::Sprite* tmpBase = new sf::Sprite(TextureManager::instance().getTexture("Textures/tower_base.png"));
+
+		this->buttons.emplace_back(tmpTower);
+
+		towerButtons[type] = tmpTower;
+		towerBases[type] = tmpBase;
+		towerButtons[type]->setPosition(Properties::buttonTowerPosition + static_cast<float>(i) * (Properties::towerSizeX + Properties::buttonTowerOffset));
+		towerBases[type]->setPosition(Properties::buttonTowerPosition + static_cast<float>(i) * (Properties::towerSizeX + Properties::buttonTowerOffset));
+	}
+
 
 	for (auto* box : this->UIBoxes) {
 		box->setFillColor(Properties::colorUIBox);
@@ -119,9 +133,14 @@ void Game::initVariables()
 
 void Game::initGrid()
 {
-	Grid::getInstance();
+	Grid::getInstance(this->enemies);
 	Grid::createPaths();
 	Grid::visualizePaths();
+}
+
+bool Game::mouseOnSprite(sf::Sprite sprite)
+{
+	return sprite.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window)));
 }
 
 //Constructors and Destructors
@@ -135,6 +154,9 @@ Game::Game()
 	this->initUI();
 	this->initGrid();
 	this->levelManager = new LevelManager(this->enemies);
+
+	this->placeMode = false;
+	this->paused = false;
 }
 
 Game::~Game()
@@ -143,12 +165,16 @@ Game::~Game()
 
 	for (auto* enemy : this->enemies)
 	{
-		delete enemy;
+		enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
+		//error cos of pausableClock
+		//delete enemy;
 	}
 
 	for (auto* tower : this->towers)
 	{
-		delete tower;
+		//HEAP CORR
+		towers.erase(std::remove(towers.begin(), towers.end(), tower), towers.end());
+		//delete tower;
 	}
 
 	for (auto* box : this->UIBoxes)
@@ -173,6 +199,11 @@ void Game::run()
 	}
 }
 
+std::vector<Enemy*>& Game::getEnemies()
+{
+	return this->enemies;
+}
+
 void Game::updatePollEvents()
 {
 	sf::Event e;
@@ -184,7 +215,9 @@ void Game::updatePollEvents()
 				this->window->close();
 				break;
 			case sf::Event::MouseMoved:
-				Grid::handleMouseMove(sf::Vector2f(e.mouseMove.x, e.mouseMove.y));
+				if (this->placeMode) {
+					Grid::handleMouseMove(sf::Vector2f(e.mouseMove.x, e.mouseMove.y));
+				}
 				//!!! HAS TO WORK WHEN PAUSED TOO, ALSO ON CLICK EVENT AS WELL
 				for (auto* button : this->buttons) {
 					if (button->getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window)))) {
@@ -195,18 +228,35 @@ void Game::updatePollEvents()
 				}
 				break;
 			case sf::Event::MouseButtonPressed:
-				if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window))) {
-					this->towers.push_back(Grid::placeTower(sf::Mouse::getPosition(*this->window)));
-					Grid::resetPaths();
-					Grid::createPaths();
-					Grid::visualizePaths();
-				}
-				if (this->pauseButtonSprite.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window)))) {
-					this->paused = true;
-					this->levelManager->pause();
-				}
-				if (this->levelButtonSprite.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window))) && this->levelManager->canSpawnEnemies()) {
-					this->levelManager->nextLevel();
+				if (e.mouseButton.button == sf::Mouse::Left) {
+					//TOWER SELECTION
+					for (int i = 0; i < static_cast<int>(TowerType::ELEM_COUNT); i++) {
+						TowerType type = static_cast<TowerType>(i);
+						
+						if (mouseOnSprite(*towerButtons[type])) {
+							this->placingTower = type;
+							this->placeMode = true;
+						}
+					}
+					//TOWER PLACING
+					if (this->placeMode) {
+						if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window))) {
+							this->towers.push_back(Grid::getInstance(this->enemies).placeTower(sf::Mouse::getPosition(*this->window), this->placingTower));
+							this->placeMode = false;
+
+							Grid::resetPaths();
+							Grid::createPaths();
+							Grid::visualizePaths();
+						}
+					}
+
+					if (mouseOnSprite(pauseButtonSprite)) {
+						this->paused = true;
+						this->levelManager->pause();
+					}
+					if (mouseOnSprite(levelButtonSprite) && this->levelManager->canSpawnEnemies()) {
+						this->levelManager->nextLevel();
+					}
 				}
 				break;
 			case sf::Event::KeyPressed:
@@ -221,6 +271,31 @@ void Game::updatePollEvents()
 					this->levelManager->pause();
 					//system("pause");
 				}
+				if (e.key.code == sf::Keyboard::Num1) {
+					this->placeMode = true;
+					this->placingTower = static_cast<TowerType>(0);
+				}
+				if (e.key.code == sf::Keyboard::Num2) {
+					this->placeMode = true;
+					this->placingTower = static_cast<TowerType>(1);
+				}
+				if (e.key.code == sf::Keyboard::Num3) {
+					this->placeMode = true;
+					this->placingTower = static_cast<TowerType>(2);
+				}
+				if (e.key.code == sf::Keyboard::Num4) {
+					this->placeMode = true;
+					this->placingTower = static_cast<TowerType>(3);
+				}
+				if (e.key.code == sf::Keyboard::Num5) {
+					this->placeMode = true;
+					this->placingTower = static_cast<TowerType>(4);
+				}
+				if (e.key.code == sf::Keyboard::Num6) {
+					this->placeMode = true;
+					this->placingTower = static_cast<TowerType>(5);
+				}
+
 			default:
 				break;
 			}
@@ -287,7 +362,7 @@ void Game::update()
 
 		for (auto* tower : this->towers)
 		{
-			tower->update(enemies);
+			tower->update();
 		}
 	}
 }
@@ -309,6 +384,13 @@ void Game::render()
 
 	Grid::draw(*this->window);
 
+	//RENDER BULLETS AFTER ENEMIES??
+
+	for (auto* tower : this->towers)
+	{
+		tower->render(this->window);
+	}
+
 	for (auto* enemy : this->enemies)
 	{
 		enemy->render(this->window);
@@ -316,7 +398,7 @@ void Game::render()
 
 	for (auto* tower : this->towers)
 	{
-		tower->render(this->window);
+		tower->renderProjectiles(this->window);
 	}
 
 	if (this->paused) {
@@ -330,6 +412,21 @@ void Game::render()
 	this->window->draw(this->levelButtonSprite);
 	this->window->draw(this->gridButtonSprite);
 	this->window->draw(this->muteButtonSprite);
+
+	for (const auto& pair : this->towerBases) {
+		TowerType key = pair.first;
+		sf::Sprite* value = pair.second;
+		
+		this->window->draw(*value);
+	}
+
+	for (const auto& pair : this->towerButtons) {
+		TowerType key = pair.first;
+		sf::Sprite* value = pair.second;
+
+		this->window->draw(*value);
+	}
+
 
 	this->window->display();
 }

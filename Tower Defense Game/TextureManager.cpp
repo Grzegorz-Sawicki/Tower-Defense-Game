@@ -7,6 +7,7 @@ sf::Texture& TextureManager::getTexture(const std::string& filename) {
         if (!texture.loadFromFile(filename)) {
             // Error loading texture
             // Handle error or throw exception
+            std::cout << "ERROR LOADING TEXTURE" << std::endl;
         }
         m_textures[filename] = texture;
     }

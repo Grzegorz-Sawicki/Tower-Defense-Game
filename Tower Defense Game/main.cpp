@@ -4,9 +4,11 @@
 int main() {
     srand(time(NULL));
 
-    Game game;
+    Game* game = new Game();
 
-    game.run();
+    game->run();
+
+    delete game;
 
     return 0;
 }

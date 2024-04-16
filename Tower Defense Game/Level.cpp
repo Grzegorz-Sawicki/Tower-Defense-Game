@@ -6,37 +6,30 @@ void Level::spawnEnemy()
 
 	Path path = Path::HORIZONTAL;
 
-	if (path == Path::HORIZONTAL) {
-		int randSpawn = rand() % 6;
-		Tile* spawnTile = Grid::getEntranceTiles()[Path::HORIZONTAL][randSpawn];
-		sf::Vector2f spawnOffset = sf::Vector2f(-Properties::windowWidth / 10, 0);
-		Enemy* tmp = new Enemy(spawnTile, spawnOffset, Path::HORIZONTAL);
-		tmp->setPositionOffset(sf::Vector2f(0.f, -5 + rand() % 11));
-		this->enemies->emplace_back(tmp);
-	}
-	//else if (path == Path::VERTICAL) {
-	//	int randSpawn = rand() % 8;
-	//	Tile* spawnTile = Grid::getEntranceTiles()[Path::VERTICAL][randSpawn];
-	//	sf::Vector2f spawnOffset = sf::Vector2f(0, -Properties::windowHeight / 10);
-	//	Enemy* tmp = new Enemy(spawnTile, spawnOffset, Path::VERTICAL);
-	//	tmp->setPositionOffset(sf::Vector2f(-5 + rand() % 11, 0.f));
-	//	enemies.emplace_back(tmp);
-	//}
+	Enemy* tmp = new Enemy(Grid::getEntranceTiles(), Path::HORIZONTAL, this->enemyType, this->enemyHealth);
+	this->enemies->emplace_back(tmp);
 }
 
-Level::Level(std::vector<Enemy*>& enemies, unsigned count, unsigned health)
+Level::Level(std::vector<Enemy*>& enemies, unsigned count, unsigned health, EnemyType type)
 {
 	this->enemyCount = count;
 	this->enemyHealth = health;
+	this->enemyType = type;
 	this->active = false;
 	this->enemies = &enemies;
-	this->enemySpawnTimer = Properties::enemySpawnTimer;
+	if (this->enemyType == EnemyType::GROUP) this->enemySpawnTimer = sf::seconds(0);
+	else this->enemySpawnTimer = Properties::enemySpawnTimer;
 	this->spawnClock.pause();
 }
 
 unsigned Level::getEnemyCount()
 {
 	return this->enemyCount;
+}
+
+EnemyType Level::getEnemyType()
+{
+	return this->enemyType;
 }
 
 sf::Time Level::getSpawnClock()

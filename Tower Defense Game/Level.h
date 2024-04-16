@@ -13,6 +13,7 @@ private:
 
 	unsigned enemyCount;
 	unsigned enemyHealth;
+	EnemyType enemyType;
 	//unsigned enemyType;
 
 	bool active;
@@ -20,9 +21,10 @@ private:
 	void spawnEnemy();
 
 public:
-	Level(std::vector<Enemy*>& enemies, unsigned count, unsigned health);
+	Level(std::vector<Enemy*>& enemies, unsigned count, unsigned health, EnemyType type);
 
 	unsigned getEnemyCount();
+	EnemyType getEnemyType();
 	sf::Time getSpawnClock();
 
 	void activate();
