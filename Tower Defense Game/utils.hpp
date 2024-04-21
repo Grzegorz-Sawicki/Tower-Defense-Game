@@ -89,4 +89,24 @@ namespace utils
         }
     }
 
+    inline std::string enemyTypeToString(EnemyType type) {
+        if (type == EnemyType::NORMAL) return "NORMAL";
+        else if (type == EnemyType::GROUP) return "GROUP";
+        else if (type == EnemyType::IMMUNE) return "IMMUNE";
+        else if (type == EnemyType::FAST) return "FAST";
+        else if (type == EnemyType::FLYING) return "FLYING";
+        else if (type == EnemyType::SPAWN) return "SPAWN";
+        else if (type == EnemyType::SPAWNED) return "SPAWNED";
+    }
+
+    inline EnemyType stringToEnemyType(std::string type) {
+        if (type == "NORMAL") return EnemyType::NORMAL;
+        else if (type == "GROUP") return EnemyType::GROUP;
+        else if (type == "IMMUNE") return EnemyType::IMMUNE;
+        else if (type == "FAST") return EnemyType::FAST;
+        else if (type == "FLYING") return EnemyType::FLYING;
+        else if (type == "SPAWN") return EnemyType::SPAWN;
+        else if (type == "SPAWNED") return EnemyType::SPAWNED;
+    }
+
 }

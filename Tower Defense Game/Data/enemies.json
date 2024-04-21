@@ -1,0 +1,67 @@
+{
+  "enemies": [
+    {
+      "name": "NORMAL",
+      "speed": 1.0,
+      "texture": "textures/enemy_normal.png",
+      "effects": []
+    },
+    {
+      "name": "GROUP",
+      "speed": 1.0,
+      "texture": "textures/enemy_group.png",
+      "effects": [
+        {
+          "name": "GROUP"
+        }
+      ]
+    },
+    {
+      "name": "IMMUNE",
+      "speed": 1.0,
+      "texture": "textures/enemy_immune.png",
+      "effects": [
+        {
+          "name": "IMMUNE"
+        }
+      ]
+    },
+    {
+      "name": "FAST",
+      "speed": 1.5,
+      "texture": "textures/enemy_fast.png",
+      "effects": []
+    },
+    {
+      "name": "SPAWN",
+      "speed": 1.0,
+      "texture": "textures/enemy_spawn.png",
+      "effects": [
+        {
+          "name": "SPAWN"
+        }
+      ]
+    },
+    {
+      "name": "SPAWNED",
+      "speed": 1.0,
+      "texture": "textures/enemy_spawned.png",
+      "effects": []
+    },
+    {
+      "name": "FLYING",
+      "speed": 1.0,
+      "texture": "textures/enemy_flying.png",
+      "effects": [
+        {
+          "name": "FLYING"
+        }
+      ]
+    }
+  ],
+
+  "BOSS": {
+    "scale": 1.75,
+    "speed": 0.8
+  }
+}

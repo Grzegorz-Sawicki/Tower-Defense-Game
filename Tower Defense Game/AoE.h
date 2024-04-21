@@ -19,9 +19,9 @@ private:
 	float slowLength = 0.f;
 	void slowEnemy();
 
-	bool isStun;
-	float stunChance;
-	float stunLength;
+	bool isStun=false;
+	float stunChance=0.f;
+	float stunLength=0.f;
 	void stunEnemy();
 
 public:

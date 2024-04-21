@@ -1,31 +1,53 @@
 #include "LevelManager.h"
 
+void LevelManager::handleJsonData()
+{
+	std::ifstream file(Properties::jsonLevelsEasyFileName);
+	if (!file.is_open()) {
+		std::cerr << "Failed to open JSON file." << std::endl;
+		system("pause");
+	}
+
+	json jsonData;
+	try {
+		file >> jsonData;
+	}
+	catch (json::parse_error& e) {
+		std::cerr << "Parse error: " << e.what() << std::endl;
+		system("pause");
+	}
+
+	file.close();
+
+	json levels = jsonData["levels"];
+
+	int lvlCount = 0;
+	for (auto level : levels) {
+		EnemyType type = utils::stringToEnemyType(level["type"]);
+		int hp = level["health"];
+		int count = level["count"];
+		bool boss = level["boss"];
+
+		lvlCount++;
+
+		this->levels[lvlCount-1] = new Level(*this->enemies, lvlCount, count, hp, type, boss);
+		
+	}
+}
+
 Level* LevelManager::getCurrentLevel()
 {
 	return this->levels[this->currentLevel-1];
 }
 
-LevelManager::LevelManager(std::vector<Enemy*> &enemies)
+LevelManager::LevelManager(std::vector<Enemy*> &enemies) : enemies(&enemies)
 {
+	this->handleJsonData();
+
+	this->levelScrollBox = new LevelScrollBox(this->levels[0], 0);
+
 	this->canSpawn = false;
 	this->currentLevel = 0;
-
-	for (int i = 0; i < 50; i+=5) {
-		levels[i] = new Level(enemies, 10, 50, EnemyType::DEFAULT);
-		levels[i+1] = new Level(enemies, 10, 50, EnemyType::GROUP);
-		levels[i+2] = new Level(enemies, 10, 50, EnemyType::IMMUNE);
-		levels[i+3] = new Level(enemies, 10, 50, EnemyType::FAST);
-		levels[i+4] = new Level(enemies, 10, 50, EnemyType::FLYING);
-	}
-
-	//levels[0] = new Level(enemies, 10, 20);
-	//levels[1] = new Level(enemies, 10, 26);
-	//levels[2] = new Level(enemies, 10, 30);
-	//levels[3] = new Level(enemies, 10, 33);
-	//levels[4] = new Level(enemies, 10, 36);
-
-	this->enemies = &enemies;
-
 	this->levelTimer = Properties::levelTimer;
 	this->nextLevel();
 }
@@ -73,6 +95,11 @@ sf::Time LevelManager::getRemainingTime()
 bool LevelManager::canSpawnEnemies()
 {
 	return this->canSpawn;
+}
+
+LevelScrollBox& LevelManager::getLevelScrollBox()
+{
+	return *this->levelScrollBox;
 }
 
 void LevelManager::setSpawn(bool can)

@@ -11,7 +11,10 @@ class Tower
 {
 private:
 	const std::vector<Enemy*>& enemies;
+
+	void handleJsonData();
 	json effects;
+	json projectileData;
 
 	sf::Sprite spriteBase;
 	sf::Sprite spriteBarrel;
@@ -30,17 +33,18 @@ private:
 	int range;
 	double shootSpeed;
 	std::string speedStr;
-	double projectileSpeed;
 
-	bool isAoe;
+	bool isAoe=false;
 	float aoeRange;
-	bool isSlow;
+	bool isSlow = false;
 	float slowValue;
 	float slowLength;
-	bool isStun;
+	bool isStun = false;
 	float stunChance;
 	float stunLength;
-	bool isBash;
+	bool isBash = false;
+	int projectileCount=1;
+	bool antiAir=false;
 
 	Enemy* targetEnemy;
 	bool targetEnemyDead;

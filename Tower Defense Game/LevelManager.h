@@ -2,12 +2,17 @@
 
 #include "include.h"
 #include "Level.h"
+#include "LevelScrollBox.h"
 
 class LevelManager
 {
 private:
 	std::vector<Enemy*> *enemies;
 	Level* levels[50];
+
+	LevelScrollBox* levelScrollBox;
+
+	void handleJsonData();
 
 	int currentLevel;
 	int remainingEnemies;
@@ -29,6 +34,7 @@ public:
 	sf::Time getLevelTimer();
 	sf::Time getRemainingTime();
 	bool canSpawnEnemies();
+	LevelScrollBox& getLevelScrollBox();
 
 	void setSpawn(bool can);
 

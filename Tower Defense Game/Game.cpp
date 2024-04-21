@@ -15,10 +15,7 @@ void Game::initSprites()
 
 void Game::initFonts()
 {
-	if (!this->font.loadFromFile("Fonts/PixellettersFull.ttf"))
-	{
-		std::cout << "COULD NOT LOAD PixelLettersFull.ttf" << "\n";
-	}
+	this->font = FontManager::instance().getFont("Fonts/PixellettersFull.ttf");
 }
 
 void Game::initUI()
@@ -123,6 +120,7 @@ void Game::initUI()
 	this->textPause = new sf::Text(Properties::textPause, this->font, 50);
 	this->textPause->setFillColor(sf::Color(255, 127, 39));
 	this->textPause->setPosition(Properties::textPausePosition);
+
 };
 
 void Game::initVariables()
@@ -250,6 +248,16 @@ void Game::updatePollEvents()
 						}
 					}
 
+					//ENEMY SELECT
+					for (auto* enemy : this->enemies)
+					{
+						if (mouseOnSprite(enemy->getSprite())) {
+							this->infoWindowEnemy = InfoWindowEnemy(*enemy);
+							this->showInfoWindow = true;
+							break;
+						}
+					}
+
 					if (mouseOnSprite(pauseButtonSprite)) {
 						this->paused = true;
 						this->levelManager->pause();
@@ -336,12 +344,19 @@ void Game::update()
 		this->level = this->levelManager->getLevel();
 		this->textLevel->setString(Properties::textLevel + std::to_string(this->level));
 
+		std::vector<Enemy*> deadSpawns;
+
 		for (auto* enemy : this->enemies)
 		{
 			enemy->update();
 			if (enemy->isDead()) {
 				this->score++;
 				this->gold++;
+
+				if (enemy->getType() == EnemyType::SPAWN) {
+					deadSpawns.emplace_back(enemy);
+				}
+
 				//DOESN'T ALWAYS WORK, BEWARE
 				enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
 
@@ -354,6 +369,14 @@ void Game::update()
 				enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
 				//delete enemy;
 			}
+		}
+
+		for (auto* ds : deadSpawns)
+		{
+			Enemy* tmp = new Enemy(*ds, sf::Vector2f(0,2));
+			enemies.emplace_back(tmp);
+			Enemy* tmp2 = new Enemy(*ds, sf::Vector2f(0, -2));
+			enemies.emplace_back(tmp2);
 		}
 
 		this->textGold->setString(Properties::textGold + std::to_string(this->gold));
@@ -427,6 +450,15 @@ void Game::render()
 		this->window->draw(*value);
 	}
 
+	if (this->showInfoWindow) {
+		this->infoWindowEnemy.render(this->window);
+	}
+
+	this->levelManager->getLevelScrollBox().draw(*this->window);
+
+	//for (auto lvlBox : this->levelManager->getLevelScrollBoxes()) {
+	//	lvlBox.draw(*this->window);
+	//}
 
 	this->window->display();
 }

@@ -25,13 +25,14 @@ void AoE::move(sf::Vector2f offset)
 
 void AoE::launch()
 {
+	float randomValue = static_cast<float>(rand()) / RAND_MAX;
+
 	for (auto* enemy : enemies) {
 		if (utils::getDistance(this->position, enemy->getPosition()) <= this->radius) {
 			if (isSlow) {
 				enemy->setSlow(this->slowValue, this->slowLength);
 			}
 			if (isStun) {
-				float randomValue = static_cast<float>(rand()) / RAND_MAX;
 				if (randomValue <= this->stunChance) {
 					enemy->setStun(this->stunLength);
 				}

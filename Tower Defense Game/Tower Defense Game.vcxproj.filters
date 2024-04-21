@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\UI">
+      <UniqueIdentifier>{7490d040-699a-4909-ace5-ab9377553284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\UI">
+      <UniqueIdentifier>{e8068c4f-7a56-46ad-88b0-f999100ea3cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\UTIL_MANAGERS">
+      <UniqueIdentifier>{b82f2c87-ec93-4b52-9c77-6603dee8f355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\UTIL_MANAGERS">
+      <UniqueIdentifier>{9784b03c-c498-49f9-8c77-c7ac3cb9fbaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,9 +48,6 @@
     <ClCompile Include="Grid.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="LevelManager.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
@@ -53,6 +62,24 @@
     </ClCompile>
     <ClCompile Include="AoE.cpp">
       <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoWindow.cpp">
+      <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoWindowEnemy.cpp">
+      <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelScroll.cpp">
+      <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelScrollBox.cpp">
+      <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Pliki źródłowe\UTIL_MANAGERS</Filter>
+    </ClCompile>
+    <ClCompile Include="FontManager.cpp">
+      <Filter>Pliki źródłowe\UTIL_MANAGERS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,9 +104,6 @@
     <ClInclude Include="Grid.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="utils.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
@@ -95,9 +119,33 @@
     <ClInclude Include="AoE.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="InfoWindow.h">
+      <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoWindowEnemy.h">
+      <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelScroll.h">
+      <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelScrollBox.h">
+      <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.hpp">
+      <Filter>Pliki nagłówkowe\UTIL_MANAGERS</Filter>
+    </ClInclude>
+    <ClInclude Include="FontManager.hpp">
+      <Filter>Pliki nagłówkowe\UTIL_MANAGERS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\towers.json">
+      <Filter>Pliki zasobów</Filter>
+    </None>
+    <None Include="Data\enemies.json">
+      <Filter>Pliki zasobów</Filter>
+    </None>
+    <None Include="Data\levels_easy.json">
       <Filter>Pliki zasobów</Filter>
     </None>
   </ItemGroup>

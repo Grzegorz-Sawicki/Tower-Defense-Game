@@ -6,30 +6,33 @@ void Level::spawnEnemy()
 
 	Path path = Path::HORIZONTAL;
 
-	Enemy* tmp = new Enemy(Grid::getEntranceTiles(), Path::HORIZONTAL, this->enemyType, this->enemyHealth);
+	Enemy* tmp = new Enemy(Grid::getEntranceTiles(), Path::HORIZONTAL, this->type, this->health, this->boss);
 	this->enemies->emplace_back(tmp);
 }
 
-Level::Level(std::vector<Enemy*>& enemies, unsigned count, unsigned health, EnemyType type)
+Level::Level(std::vector<Enemy*>& enemies, int number, unsigned count, unsigned health, EnemyType type, bool boss) : 
+	number(number), count(count), health(health), type(type), boss(boss)
 {
-	this->enemyCount = count;
-	this->enemyHealth = health;
-	this->enemyType = type;
 	this->active = false;
 	this->enemies = &enemies;
-	if (this->enemyType == EnemyType::GROUP) this->enemySpawnTimer = sf::seconds(0);
+	if (this->type == EnemyType::GROUP) this->enemySpawnTimer = sf::seconds(0);
 	else this->enemySpawnTimer = Properties::enemySpawnTimer;
 	this->spawnClock.pause();
 }
 
 unsigned Level::getEnemyCount()
 {
-	return this->enemyCount;
+	return this->count;
 }
 
 EnemyType Level::getEnemyType()
 {
-	return this->enemyType;
+	return this->type;
+}
+
+int Level::getNumber()
+{
+	return this->number;
 }
 
 sf::Time Level::getSpawnClock()
@@ -56,12 +59,12 @@ void Level::resumeClock()
 
 void Level::update()
 {
-	if (this->active && this->enemyCount > 0) {
+	if (this->active && this->count > 0) {
 		if (this->spawnClock.getElapsedTime() >= this->enemySpawnTimer) {
 			this->spawnClock.restart();
 
 			this->spawnEnemy();
-			this->enemyCount--;
+			this->count--;
 		}
 	}
 }

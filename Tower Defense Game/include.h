@@ -39,7 +39,7 @@ enum class Path {
 };
 
 enum class EnemyType {
-    DEFAULT, GROUP, IMMUNE, FAST, SPAWN, SPAWNED, FLYING, BOSS
+    NORMAL, GROUP, IMMUNE, FAST, SPAWN, SPAWNED, FLYING
 };
 
 enum class TowerType {

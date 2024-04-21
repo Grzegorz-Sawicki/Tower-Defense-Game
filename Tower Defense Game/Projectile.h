@@ -7,19 +7,18 @@
 class Projectile
 {
 private:
-    //sf::Sprite sprite;
-    //sf::Texture texture;
+    sf::Sprite sprite;
 
     const std::vector<Enemy*>& enemies;
     json effects;
-
-    //temp
-    sf::CircleShape sprite;
+    json projectileData;
 
     TowerType type;
     sf::Vector2f velocity;
     float speed;
     int damage;
+    int moveType;
+    bool rotate;
 
     AoE* aoe;
     bool isAoe=false;
@@ -27,10 +26,10 @@ private:
     bool isSlow=false;
     float slowValue=0.f;
     float slowLength=0.f;
-    bool isStun;
+    bool isStun=false;
     float stunChance;
     float stunLength;
-    bool isBash;
+    bool isBash=false;
 
     Enemy* targetEnemy;
     bool enemyDead;
@@ -44,9 +43,9 @@ private:
     bool destroyed;
 
     //Functions
-    void initSprite();
+    void initSprite(json texture);
 public:
-	Projectile(const std::vector<Enemy*>& enemies, float startX, float startY, Enemy* targetEnemy, TowerType type, int damage, float speed, json effects);
+	Projectile(const std::vector<Enemy*>& enemies, float startX, float startY, Enemy* targetEnemy, TowerType type, int damage, json effects, json projectileData);
 	virtual ~Projectile();
 
     const sf::Vector2f getPosition();

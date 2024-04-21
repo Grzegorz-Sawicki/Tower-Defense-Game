@@ -18,20 +18,21 @@ void Projectile::stunEnemy()
 	}
 }
 
-void Projectile::initSprite()
+void Projectile::initSprite(json texture)
 {
-	this->sprite.setFillColor(sf::Color::Yellow);
-	this->sprite.setRadius(4.f);
-	this->sprite.setOrigin(4.f, 4.f);
+	this->sprite.setTexture(TextureManager::instance().getTexture(texture));
+	this->sprite.setOrigin(this->sprite.getGlobalBounds().width / 2, this->sprite.getGlobalBounds().height / 2);
 }
 
-Projectile::Projectile(const std::vector<Enemy*>& enemies, float startX, float startY, Enemy* targetEnemy, TowerType type, int damage, float speed, json effects)
-	: type(type), enemies(enemies), speed(speed), effects(effects)
+Projectile::Projectile(const std::vector<Enemy*>& enemies, float startX, float startY, Enemy* targetEnemy, TowerType type, int damage, json effects, json projectileData)
+	: type(type), damage(damage), enemies(enemies), effects(effects), projectileData(projectileData)
 {
-	this->initSprite();
+	this->initSprite(this->projectileData["texture"]);
 	this->sprite.setPosition(startX, startY);
 
-	this->damage = damage;
+	this->speed = this->projectileData["speed"];
+	this->moveType = this->projectileData["moveType"];
+	this->rotate = this->projectileData["rotate"];
 
 	for (json effect : this->effects) {
 		if (effect["name"] == "aoe") {
@@ -84,7 +85,8 @@ bool Projectile::isDestroyed()
 
 void Projectile::update()
 {
-	if (isBash) {
+	if (this->rotate) this->sprite.rotate(10);
+	if (this->isBash) {
 		this->pulseAoE();
 		this->destroyed = true;
 		return;

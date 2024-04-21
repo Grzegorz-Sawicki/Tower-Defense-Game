@@ -1,0 +1,323 @@
+{
+  "levels": [
+    {
+      "type": "IMMUNE",
+      "health": 20,
+      "count": 20,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 26,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 30,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 33,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 36,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 60,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 40,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 500,
+      "count": 1,
+      "boss": true
+    },
+    {
+      "type": "NORMAL",
+      "health": 58,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "GROUP",
+      "health": 66,
+      "count": 10,
+      "boss": false
+    },
+
+
+
+    {
+      "type": "IMMUNE",
+      "health": 73,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "FAST",
+      "health": 79,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "SPAWN",
+      "health": 132,
+      "count": 4,
+      "boss": false
+    },
+    {
+      "type": "FLYING",
+      "health": 44,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 96,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 1544,
+      "count": 1,
+      "boss": true
+    },
+    {
+      "type": "GROUP",
+      "health": 145,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "IMMUNE",
+      "health": 160,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "FAST",
+      "health": 174,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "SPAWN",
+      "health": 290,
+      "count": 4,
+      "boss": false
+    },
+
+
+
+
+
+
+    {
+      "type": "FLYING",
+      "health": 96,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 212,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 283,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "GROUP",
+      "health": 1597,
+      "count": 3,
+      "boss": true
+    },
+    {
+      "type": "IMMUNE",
+      "health": 353,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "FAST",
+      "health": 383,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "SPAWN",
+      "health": 638,
+      "count": 4,
+      "boss": false
+    },
+    {
+      "type": "FLYING",
+      "health": 212,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 468,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 623,
+      "count": 10,
+      "boss": false
+    },
+
+
+
+
+
+
+    {
+      "type": "GROUP",
+      "health": 702,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "IMMUNE",
+      "health": 9332,
+      "count": 1,
+      "boss": true
+    },
+    {
+      "type": "FAST",
+      "health": 843,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "SPAWN",
+      "health": 1405,
+      "count": 4,
+      "boss": false
+    },
+    {
+      "type": "FLYING",
+      "health": 468,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 1030,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 1370,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "GROUP",
+      "health": 1546,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "IMMUNE",
+      "health": 1711,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "FAST",
+      "health": 22263,
+      "count": 1,
+      "boss": true
+    },
+
+
+
+
+    {
+      "type": "SPAWN",
+      "health": 3092,
+      "count": 4,
+      "boss": false
+    },
+    {
+      "type": "FLYING",
+      "health": 1030,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 2267,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "NORMAL",
+      "health": 3015,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "GROUP",
+      "health": 3401,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "IMMUNE",
+      "health": 3764,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "FAST",
+      "health": 4081,
+      "count": 10,
+      "boss": false
+    },
+    {
+      "type": "SPAWN",
+      "health": 27211,
+      "count": 1,
+      "boss": true
+    },
+    {
+      "type": "FLYING",
+      "health": 27001,
+      "count": 1,
+      "boss": true
+    },
+    {
+      "type": "IMMUNE",
+      "health": 4535,
+      "count": 30,
+      "boss": false
+    }
+  ]
+}

@@ -45,3 +45,18 @@ std::string Properties::textPause = "Paused: ";
 sf::Vector2f Properties::textPausePosition = sf::Vector2f(230.f, 260.f);
 
 std::string	Properties::jsonTowersFileName = "Data/towers.json";
+std::string	Properties::jsonEnemiesFileName = "Data/enemies.json";
+std::string	Properties::jsonLevelsEasyFileName = "Data/levels_easy.json";
+
+//INFO BOXES
+sf::Vector2f Properties::mainInfoBoxPosition = sf::Vector2f(630.f, 140.f);
+sf::Vector2f Properties::mainInfoBoxSize = sf::Vector2f(210.f, 200.f);
+sf::Color Properties::mainInfoBoxBgColor = sf::Color(180.f, 180.f, 180.f);
+sf::Vector2f Properties::subInfoBoxPosition = sf::Vector2f(652.f, 200.f);
+sf::Vector2f Properties::subInfoBoxSize = sf::Vector2f(150.f, 108.f);
+sf::Color Properties::subInfoBoxBgColor = sf::Color(236, 129, 57);
+
+sf::Color Properties::gray = sf::Color(200,200,200);
+sf::Color Properties::darkGray = sf::Color(100, 100, 100);
+sf::Vector2f Properties::levelScrollBoxSize = sf::Vector2f(75.f, 40.f);
+sf::Vector2f Properties::levelScrollBoxPosition = sf::Vector2f(Properties::gridLeftOffset, 564.f);

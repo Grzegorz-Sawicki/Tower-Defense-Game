@@ -49,6 +49,21 @@ struct Properties
 	static sf::Vector2f textPausePosition;
 
 	static std::string jsonTowersFileName;
+	static std::string jsonEnemiesFileName;
+	static std::string jsonLevelsEasyFileName;
+
+	//INFO BOXES
+	static sf::Vector2f mainInfoBoxPosition;
+	static sf::Vector2f mainInfoBoxSize;
+	static sf::Color mainInfoBoxBgColor;
+	static sf::Vector2f subInfoBoxPosition;
+	static sf::Vector2f subInfoBoxSize;
+	static sf::Color subInfoBoxBgColor;
+
+	static sf::Color gray;
+	static sf::Color darkGray;
+	static sf::Vector2f levelScrollBoxSize;
+	static sf::Vector2f levelScrollBoxPosition;
 };
 
 

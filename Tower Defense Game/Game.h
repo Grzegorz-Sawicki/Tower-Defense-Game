@@ -5,7 +5,9 @@
 #include "Enemy.h"
 #include "Tower.h"
 #include "TextureManager.hpp"
+#include "FontManager.hpp"
 #include "LevelManager.h"
+#include "InfoWindowEnemy.h"
 
 class Game
 {
@@ -38,6 +40,9 @@ private:
 	sf::Texture gridButtonTexture;
 	sf::Sprite muteButtonSprite;
 	sf::Texture muteButtonTexture;
+
+	InfoWindowEnemy infoWindowEnemy;
+	bool showInfoWindow = false;
 
 	std::map<TowerType, sf::Sprite*> towerButtons;
 	std::map<TowerType, sf::Sprite*> towerBases;

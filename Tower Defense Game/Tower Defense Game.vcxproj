@@ -135,10 +135,15 @@
   <ItemGroup>
     <ClCompile Include="AoE.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="InfoWindow.cpp" />
+    <ClCompile Include="InfoWindowEnemy.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelManager.cpp" />
+    <ClCompile Include="LevelScroll.cpp" />
+    <ClCompile Include="LevelScrollBox.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PausableClock.hpp" />
     <ClCompile Include="Projectile.cpp" />
@@ -150,11 +155,16 @@
   <ItemGroup>
     <ClInclude Include="AoE.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="FontManager.hpp" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="include.h" />
+    <ClInclude Include="InfoWindow.h" />
+    <ClInclude Include="InfoWindowEnemy.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />
+    <ClInclude Include="LevelScroll.h" />
+    <ClInclude Include="LevelScrollBox.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="TextureManager.hpp" />
@@ -163,6 +173,8 @@
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\enemies.json" />
+    <None Include="Data\levels_easy.json" />
     <None Include="Data\towers.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

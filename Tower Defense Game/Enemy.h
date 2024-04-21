@@ -14,10 +14,20 @@ private:
 	sf::RectangleShape healthBar;
 	sf::RectangleShape healthBarRed;
 
+	json effects;
+	void handleJsonData();
+
 	int hp;
 	int maxhp;
 	float moveSpeed;
 	float moveSpeedBase;
+
+	bool boss;
+	bool group=false;
+	bool flying=false;
+	bool spawn=false;
+	bool immune=false;
+
 	bool dead;
 	Path path;
 	EnemyType type;
@@ -37,7 +47,7 @@ private:
 
 
 	//Functions
-	void initSprite();
+	void initSprite(json texture);
 	void initHealthBar();
 	void move(sf::Vector2f offset);
 	void moveCase();
@@ -46,21 +56,26 @@ private:
 	sf::Vector2f createPositionOffset();
 	sf::Vector2f createSpawnDirection();
 
+	void unDie();
+
 
 public:
-	Enemy(Tile* tile, sf::Vector2f spawnOffset, Path path);
-	Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp);
+	Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss);
+	Enemy(const Enemy& other, sf::Vector2f offset);
 	virtual ~Enemy();
 
 	sf::Vector2f getPosition(bool ignoreOffset=false);
 	sf::Vector2f getPositionOffset();
 	sf::FloatRect getBounds();
 	int getHp();
+	int getMaxHp();
 	bool isDead();
+	bool isBoss();
 	sf::Vector2f getDirection();
 	EnemyType getType();
 	Tile* getCurrentTile();
 	bool didReachedEntrance();
+	sf::Sprite getSprite();
 
 	void setSlow(float value, float length);
 	void setStun(float length);
@@ -68,6 +83,11 @@ public:
 	void setPositionOffset(sf::Vector2f offset);
 	void setDirection(sf::Vector2f direction);
 	void setCurrentTile(Tile* tile);
+
+	void setDead(bool dead);
+	void setMaxHp(int maxHp);
+	void setHp(int hp);
+	void setPosition(sf::Vector2f position);
 
 	//Functions
 	void takeDamage(int damage);

@@ -1,25 +1,69 @@
 #include "Enemy.h"
 
-void Enemy::initSprite()
+void Enemy::handleJsonData()
 {
-	switch (this->type) {
-	case EnemyType::DEFAULT:
-		this->sprite.setTexture(TextureManager::instance().getTexture("Textures/enemy_basic.png"));
-		break;
-	case EnemyType::GROUP:
-		this->sprite.setTexture(TextureManager::instance().getTexture("Textures/enemy_group.png"));
-		break;
-	case EnemyType::IMMUNE:
-		this->sprite.setTexture(TextureManager::instance().getTexture("Textures/enemy_immune.png"));
-		break;
-	case EnemyType::FAST:
-		this->sprite.setTexture(TextureManager::instance().getTexture("Textures/enemy_fast.png"));
-		break;
-	case EnemyType::FLYING:
-		this->sprite.setTexture(TextureManager::instance().getTexture("Textures/enemy_flying.png"));
-		break;
+	std::ifstream file(Properties::jsonEnemiesFileName);
+	if (!file.is_open()) {
+		std::cerr << "Failed to open JSON file." << std::endl;
+		system("pause");
 	}
 
+	json jsonData;
+	try {
+		file >> jsonData;
+	}
+	catch (json::parse_error& e) {
+		std::cerr << "Parse error: " << e.what() << std::endl;
+		system("pause");
+	}
+
+	file.close();
+
+	json enemies = jsonData["enemies"];
+
+	json enemy = enemies[static_cast<int>(type)];
+	this->moveSpeedBase = enemy["speed"];
+	this->moveSpeed = this->moveSpeedBase;
+	this->initSprite(enemy["texture"]);
+
+
+	this->effects = enemy["effects"];
+
+	//ENEMY EFFECTS:
+	/*
+		group - spawn all at once
+		immune - immune to slow
+		spawn - spawn 2 spawned enemies with half health
+		flying - ignores path
+	*/
+
+	for (json effect : this->effects) {
+		if (effect["name"] == "GROUP") {
+			this->group = true;
+		}
+		else if (effect["name"] == "IMMUNE") {
+			this->immune = true;
+		}
+		else if (effect["name"] == "SPAWN") {
+			this->spawn = true;
+		}
+		else if (effect["name"] == "FLYING") {
+			this->flying = true;
+		}
+	}
+
+	//BOSS HANDLING
+	json boss = jsonData["BOSS"];
+	if (this->boss) {
+		this->sprite.setScale(sf::Vector2f(boss["scale"], boss["scale"]));
+		this->moveSpeedBase = boss["speed"];
+		this->moveSpeed = this->moveSpeedBase;
+	}
+}
+
+void Enemy::initSprite(json texture)
+{
+	this->sprite.setTexture(TextureManager::instance().getTexture(texture));
 	this->sprite.setOrigin(this->sprite.getGlobalBounds().width / 2, this->sprite.getGlobalBounds().height / 2);
 	this->sprite.rotate(90);
 }
@@ -46,7 +90,7 @@ void Enemy::move(sf::Vector2f offset)
 
 void Enemy::moveCase()
 {
-	if (this->type == EnemyType::FLYING) {
+	if (this->flying) {
 		this->move(this->direction * moveSpeed);
 	}
 	else {
@@ -61,7 +105,7 @@ void Enemy::moveCase()
 
 		Tile* neighborTile = this->getCurrentTile()->getNeighbors()[this->currentArrow];
 
-		if (neighborTile != nullptr && this->getPosition(true) == neighborTile->getPosition()) {
+		if (neighborTile != nullptr && utils::getDistance(this->getPosition(true), neighborTile->getPosition()) <= 1.f) {
 			this->currentTile->occupyDec();
 			this->currentTile = neighborTile;
 
@@ -116,12 +160,10 @@ sf::Vector2f Enemy::createSpawnOffset()
 	}
 }
 
-Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp) : path(path), type(type)
+Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss) : path(path), type(type), boss(boss)
 {
-	this->moveSpeedBase = 1.f;
-	this->moveSpeed = this->moveSpeedBase;
+	this->handleJsonData();
 
-	this->initSprite();
 	this->currentTile = this->chooseSpawnTile(entranceTiles);
 	this->currentTile->occupyInc();
 	this->sprite.setPosition(this->currentTile->getPosition() + this->createSpawnOffset());
@@ -134,6 +176,43 @@ Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyT
 	this->reachedEntrance = false;
 	this->maxhp = hp;
 	this->hp = hp;
+}
+
+Enemy::Enemy(const Enemy& other, sf::Vector2f offset)
+{
+	this->boss = other.boss;
+	this->currentArrow = other.currentArrow;
+	this->currentTile = other.currentTile;
+	this->dead = false;
+	this->reachedEntrance = other.reachedEntrance;
+	this->path = other.path;
+	this->unDie();
+
+	this->direction = other.direction;
+	this->effects = other.effects;
+	this->healthBar = other.healthBar;
+	this->healthBarRed = other.healthBarRed;
+	this->maxhp = other.maxhp / 2;
+	this->hp = this->maxhp;
+	this->moveSpeedBase = other.moveSpeedBase;
+	this->moveSpeed = other.moveSpeedBase;
+
+	this->slowClock = other.slowClock;
+	this->slowLength = other.slowLength;
+
+	this->stunClock = other.stunClock;
+	this->stunLength = other.stunLength;
+
+	this->sprite = sf::Sprite();
+	this->type = EnemyType::SPAWNED;
+	this->handleJsonData();
+	this->sprite.setPosition(other.sprite.getPosition());
+	this->sprite.move(-other.positionOffset);
+	this->positionOffset = offset;
+	this->setPositionOffset(offset);
+
+
+	this->initHealthBar();
 }
 
 Enemy::~Enemy()
@@ -167,6 +246,14 @@ bool Enemy::isDead()
 	return this->dead;
 }
 
+void Enemy::unDie()
+{
+	this->currentTile->occupyInc();
+	Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
+	if (nextObjectiveTile != nullptr && this->reachedEntrance)
+		nextObjectiveTile->occupyInc();
+}
+
 sf::Vector2f Enemy::getDirection()
 {
 	return this->direction;
@@ -182,6 +269,8 @@ Tile* Enemy::getCurrentTile()
 	return this->currentTile;
 }
 
+
+
 bool Enemy::didReachedEntrance()
 {
 	return this->reachedEntrance;
@@ -189,19 +278,26 @@ bool Enemy::didReachedEntrance()
 
 void Enemy::setSlow(float value, float length)
 {
-	this->moveSpeed = this->moveSpeedBase;
+	if (!this->immune) {
+		this->moveSpeed = this->moveSpeedBase;
 
-	this->slowed = true;
-	this->slowValue = value;
-	this->slowLength = sf::seconds(length);
-	this->moveSpeed *= (1-slowValue);
-	this->slowClock.restart();
+		this->slowed = true;
+		this->slowValue = value;
+		this->slowLength = sf::seconds(length);
+		this->moveSpeed *= (1 - slowValue);
+		this->slowClock.restart();
+	}
 }
 
 void Enemy::setPositionOffset(sf::Vector2f offset)
 {
 	this->positionOffset = offset;
 	this->sprite.setPosition(this->sprite.getPosition() + offset);
+}
+
+int Enemy::getMaxHp()
+{
+	return this->maxhp;
 }
 
 void Enemy::setDirection(sf::Vector2f direction)
@@ -212,6 +308,11 @@ void Enemy::setDirection(sf::Vector2f direction)
 void Enemy::setCurrentTile(Tile* tile)
 {
 	this->currentTile = tile;
+}
+
+bool Enemy::isBoss()
+{
+	return this->boss;
 }
 
 void Enemy::setStun(float length)
@@ -241,6 +342,9 @@ void Enemy::die()
 	if (nextObjectiveTile != nullptr && this->reachedEntrance)
 		nextObjectiveTile->occupyDec();
 	this->dead = true;
+
+	this->healthBar.setSize(sf::Vector2f(0, 0));
+	this->healthBarRed.setSize(sf::Vector2f(0, 0));
 }
 
 void Enemy::updateHealthBar()
@@ -269,9 +373,9 @@ void Enemy::update()
 
 			if (!this->didReachedEntrance()) {
 				this->move(this->direction * moveSpeed);
-				if (this->getCurrentTile()->getPosition() == this->getPosition(true)) {
+				if (utils::getDistance(this->getCurrentTile()->getPosition(),this->getPosition(true)) <= 1.f) {
 					this->reachedEntrance = true;
-					if (this->type != EnemyType::FLYING) {
+					if (!this->flying) {
 						this->currentArrow = this->currentTile->getArrow(this->path);
 						this->direction = utils::getArrowDirection(this->currentTile->getArrow(this->path));
 
@@ -289,9 +393,34 @@ void Enemy::update()
 	}
 }
 
+sf::Sprite Enemy::getSprite()
+{
+	return this->sprite;
+}
+
 void Enemy::render(sf::RenderTarget* target)
 {
 	target->draw(this->sprite);
 	target->draw(this->healthBarRed);
 	target->draw(this->healthBar);
+}
+
+void Enemy::setDead(bool dead)
+{
+	this->dead = dead;
+}
+
+void Enemy::setMaxHp(int maxHp)
+{
+	this->maxhp = maxHp;
+}
+
+void Enemy::setHp(int hp)
+{
+	this->hp = hp;
+}
+
+void Enemy::setPosition(sf::Vector2f position)
+{
+	this->sprite.setPosition(position);
 }
