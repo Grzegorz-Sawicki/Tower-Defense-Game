@@ -56,7 +56,7 @@
         "speed": 1.5,
         "moveType": 1,
         "rotate": false,
-        "texture": "textures/projectile_pellet.png"
+        "texture": "textures/projectile_dart.png"
       }
     },
     {
@@ -83,7 +83,7 @@
         "speed": 2.0,
         "moveType": 0,
         "rotate": false,
-        "texture": "textures/projectile_pellet.png"
+        "texture": "textures/projectile_swarm.png"
       }
     },
     {
@@ -113,7 +113,7 @@
         "speed": 2.0,
         "moveType": 0,
         "rotate": true,
-        "texture": "textures/projectile_squirt.png"
+        "texture": "textures/projectile_frost.png"
       }
     },
     {

@@ -26,6 +26,7 @@ private:
 	sf::RectangleShape* UIButtonBox;
 	sf::RectangleShape* UILevelBox;
 
+
 	std::vector <sf::Sprite*> buttons;
 	sf::Sprite pauseButtonSprite;
 	sf::Texture pauseButtonTexture;
@@ -59,7 +60,7 @@ private:
 	sf::RectangleShape* UIPauseBox;
 	sf::Text* textPause;
 
-	//
+	sf::RectangleShape scrollBlockBox;
 
 	std::vector<Enemy*> enemies;
 	std::vector<Tower*> towers;

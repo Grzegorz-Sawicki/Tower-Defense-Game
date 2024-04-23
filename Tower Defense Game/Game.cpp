@@ -121,6 +121,13 @@ void Game::initUI()
 	this->textPause->setFillColor(sf::Color(255, 127, 39));
 	this->textPause->setPosition(Properties::textPausePosition);
 
+	this->scrollBlockBox.setFillColor(Properties::darkGray);
+	this->scrollBlockBox.setPosition(Properties::windowWidth - Properties::UIButtonBoxWidth, Properties::windowHeight - Properties::UILevelBoxHeight);
+	this->scrollBlockBox.setSize(sf::Vector2f(
+			Properties::windowWidth - this->scrollBlockBox.getPosition().x, 
+			Properties::windowHeight - this->scrollBlockBox.getPosition().y)
+	);
+
 };
 
 void Game::initVariables()
@@ -407,8 +414,6 @@ void Game::render()
 
 	Grid::draw(*this->window);
 
-	//RENDER BULLETS AFTER ENEMIES??
-
 	for (auto* tower : this->towers)
 	{
 		tower->render(this->window);
@@ -424,6 +429,7 @@ void Game::render()
 		tower->renderProjectiles(this->window);
 	}
 
+	//PAUSE/RESUME BUTTONS
 	if (this->paused) {
 		this->window->draw(*this->UIPauseBox);
 		this->window->draw(*this->textPause);
@@ -431,10 +437,20 @@ void Game::render()
 	}
 	else this->window->draw(this->pauseButtonSprite);
 
+	//LEVEL SCROLL BOX
+	for (LevelScrollBox* lvlBox : this->levelManager->getLevelScrollBoxes()) {
+		lvlBox->draw(*this->window);
+	}
+	this->levelManager->getLevelScrollOutline().draw(*this->window);
+	this->window->draw(this->scrollBlockBox);
+
+	//BUTTONS
 	this->window->draw(this->resetButtonSprite);
 	this->window->draw(this->levelButtonSprite);
 	this->window->draw(this->gridButtonSprite);
 	this->window->draw(this->muteButtonSprite);
+
+
 
 	for (const auto& pair : this->towerBases) {
 		TowerType key = pair.first;
@@ -454,11 +470,7 @@ void Game::render()
 		this->infoWindowEnemy.render(this->window);
 	}
 
-	this->levelManager->getLevelScrollBox().draw(*this->window);
 
-	//for (auto lvlBox : this->levelManager->getLevelScrollBoxes()) {
-	//	lvlBox.draw(*this->window);
-	//}
 
 	this->window->display();
 }

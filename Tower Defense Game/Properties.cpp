@@ -30,7 +30,7 @@ float Properties::tileSize = 18.f;
 int Properties::gridTileNumHorizontal = 28;
 int Properties::gridTileNumVertical = 24;
 sf::Time Properties::enemySpawnTimer = sf::seconds(0.7);
-sf::Time Properties::levelTimer = sf::seconds(10);
+sf::Time Properties::levelTimer = sf::seconds(35);
 
 int Properties::enemyBarrierX = 580;
 int Properties::enemyBarrierY = 540;
@@ -58,5 +58,13 @@ sf::Color Properties::subInfoBoxBgColor = sf::Color(236, 129, 57);
 
 sf::Color Properties::gray = sf::Color(200,200,200);
 sf::Color Properties::darkGray = sf::Color(100, 100, 100);
+sf::Color Properties::orange = sf::Color(255,127,0);
 sf::Vector2f Properties::levelScrollBoxSize = sf::Vector2f(75.f, 40.f);
 sf::Vector2f Properties::levelScrollBoxPosition = sf::Vector2f(Properties::gridLeftOffset, 564.f);
+
+sf::Color Properties::levelScrollNormalColor = sf::Color(34,34,34);
+sf::Color Properties::levelScrollGroupColor = sf::Color(0,85,170);
+sf::Color Properties::levelScrollImmuneColor = sf::Color(170,0,170);
+sf::Color Properties::levelScrollFastColor = sf::Color(170,0,0);
+sf::Color Properties::levelScrollSpawnColor = sf::Color(0,85,0);
+sf::Color Properties::levelScrollFlyingColor = sf::Color(170,170,0);

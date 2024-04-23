@@ -178,12 +178,6 @@ void Tower::update()
 
 			}
 		}
-		//if (targetedEnemiesCount < this->projectileCount) {
-		//	for (auto& enemy : targetedEnemies) {
-		//		this->shoot(enemy);
-		//		if (++targetedEnemiesCount >= this->projectileCount) break;
-		//	}
-		//}
 
 	}
 

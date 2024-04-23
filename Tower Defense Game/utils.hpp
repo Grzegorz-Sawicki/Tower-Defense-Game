@@ -99,6 +99,17 @@ namespace utils
         else if (type == EnemyType::SPAWNED) return "SPAWNED";
     }
 
+    inline sf::Color enemyTypeToColor(EnemyType type) {
+        switch (type) {
+        case EnemyType::NORMAL: return Properties::levelScrollNormalColor;
+        case EnemyType::GROUP: return Properties::levelScrollGroupColor;
+        case EnemyType::IMMUNE: return Properties::levelScrollImmuneColor;
+        case EnemyType::FAST: return Properties::levelScrollFastColor;
+        case EnemyType::SPAWN: return Properties::levelScrollSpawnColor;
+        case EnemyType::FLYING: return Properties::levelScrollFlyingColor;
+        }
+    }
+
     inline EnemyType stringToEnemyType(std::string type) {
         if (type == "NORMAL") return EnemyType::NORMAL;
         else if (type == "GROUP") return EnemyType::GROUP;

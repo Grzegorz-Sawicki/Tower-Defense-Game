@@ -40,6 +40,11 @@ sf::Time Level::getSpawnClock()
 	return this->spawnClock.getElapsedTime();
 }
 
+bool Level::isBoss()
+{
+	return this->boss;
+}
+
 void Level::activate()
 {
 	this->active = true;

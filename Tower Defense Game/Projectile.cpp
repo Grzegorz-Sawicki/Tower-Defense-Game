@@ -24,6 +24,16 @@ void Projectile::initSprite(json texture)
 	this->sprite.setOrigin(this->sprite.getGlobalBounds().width / 2, this->sprite.getGlobalBounds().height / 2);
 }
 
+void Projectile::rotateTowardsEnemy()
+{
+	sf::Vector2f enemyPos = this->targetEnemy->getPosition();
+	sf::Vector2f projectilePos = this->getPosition();
+
+	float angle = utils::getRotation(projectilePos, enemyPos);
+
+	this->sprite.setRotation(angle);
+}
+
 Projectile::Projectile(const std::vector<Enemy*>& enemies, float startX, float startY, Enemy* targetEnemy, TowerType type, int damage, json effects, json projectileData)
 	: type(type), damage(damage), enemies(enemies), effects(effects), projectileData(projectileData)
 {
@@ -86,6 +96,9 @@ bool Projectile::isDestroyed()
 void Projectile::update()
 {
 	if (this->rotate) this->sprite.rotate(10);
+	else {
+		this->rotateTowardsEnemy();
+	}
 	if (this->isBash) {
 		this->pulseAoE();
 		this->destroyed = true;

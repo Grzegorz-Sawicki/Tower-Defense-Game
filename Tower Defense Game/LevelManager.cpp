@@ -31,6 +31,7 @@ void LevelManager::handleJsonData()
 		lvlCount++;
 
 		this->levels[lvlCount-1] = new Level(*this->enemies, lvlCount, count, hp, type, boss);
+		this->levelScrollBoxes.emplace_back(new LevelScrollBox(this->levels[lvlCount - 1], (lvlCount - 1) * Properties::levelScrollBoxSize.x));
 		
 	}
 }
@@ -44,7 +45,8 @@ LevelManager::LevelManager(std::vector<Enemy*> &enemies) : enemies(&enemies)
 {
 	this->handleJsonData();
 
-	this->levelScrollBox = new LevelScrollBox(this->levels[0], 0);
+	this->levelScrollOutline = new LevelScrollBox();
+	this->scrollTimer = Properties::levelTimer / Properties::levelScrollBoxSize.x;
 
 	this->canSpawn = false;
 	this->currentLevel = 0;
@@ -58,6 +60,19 @@ void LevelManager::nextLevel()
 		this->currentLevel++;
 		this->levelClock.restart();
 		this->getCurrentLevel()->activate();
+
+		if (this->currentLevel > 1) {
+			int requiredScrolls = static_cast<int>(Properties::levelScrollBoxSize.x);
+			std::cout << this->currentScrollCount << " / " << requiredScrolls << std::endl;
+
+			if (this->currentScrollCount < requiredScrolls) {
+				for (auto* lbox : this->levelScrollBoxes) {
+					lbox->move(sf::Vector2f(-(requiredScrolls - currentScrollCount), 0.f));
+				}
+			}
+		}
+
+		this->currentScrollCount = 0;
 	}
 }
 
@@ -67,6 +82,7 @@ void LevelManager::pause()
 		level->pauseClock();
 	}
 	this->levelClock.pause();
+	this->scrollClock.pause();
 }
 
 void LevelManager::resume()
@@ -75,6 +91,7 @@ void LevelManager::resume()
 		level->resumeClock();
 	}
 	this->levelClock.resume();
+	this->scrollClock.resume();
 }
 
 int LevelManager::getLevel()
@@ -97,9 +114,14 @@ bool LevelManager::canSpawnEnemies()
 	return this->canSpawn;
 }
 
-LevelScrollBox& LevelManager::getLevelScrollBox()
+LevelScrollBox& LevelManager::getLevelScrollOutline()
 {
-	return *this->levelScrollBox;
+	return *this->levelScrollOutline;
+}
+
+std::vector<LevelScrollBox*>& LevelManager::getLevelScrollBoxes()
+{
+	return this->levelScrollBoxes;
 }
 
 void LevelManager::setSpawn(bool can)
@@ -111,9 +133,18 @@ void LevelManager::update()
 {
 	if (this->canSpawn) {
 		this->levelClock.resume();
+		this->scrollClock.resume();
 		for (auto* level : this->levels)
 		{
 			level->update();
+		}
+
+		if (this->currentLevel < 50 && this->scrollClock.getElapsedTime() >= this->scrollTimer) {
+			this->scrollClock.restart();
+			for (auto* lbox : this->levelScrollBoxes) {
+				lbox->move(sf::Vector2f(-1.f, 0.f));
+			}
+			this->currentScrollCount++;
 		}
 
 		if (this->levelClock.getElapsedTime() >= this->levelTimer) {
@@ -123,5 +154,6 @@ void LevelManager::update()
 	}
 	else {
 		this->levelClock.pause();
+		this->scrollClock.pause();
 	}
 }

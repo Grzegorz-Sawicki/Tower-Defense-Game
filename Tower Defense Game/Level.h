@@ -29,6 +29,7 @@ public:
 	EnemyType getEnemyType();
 	int getNumber();
 	sf::Time getSpawnClock();
+	bool isBoss();
 
 	void activate();
 	void pauseClock();

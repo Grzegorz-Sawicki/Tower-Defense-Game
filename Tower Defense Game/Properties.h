@@ -62,8 +62,16 @@ struct Properties
 
 	static sf::Color gray;
 	static sf::Color darkGray;
+	static sf::Color orange;
 	static sf::Vector2f levelScrollBoxSize;
 	static sf::Vector2f levelScrollBoxPosition;
+
+	static sf::Color levelScrollNormalColor;
+	static sf::Color levelScrollGroupColor;
+	static sf::Color levelScrollImmuneColor;
+	static sf::Color levelScrollFastColor;
+	static sf::Color levelScrollSpawnColor;
+	static sf::Color levelScrollFlyingColor;
 };
 
 

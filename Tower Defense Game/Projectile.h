@@ -38,6 +38,7 @@ private:
     void pulseAoE();
     void slowEnemy();
     void stunEnemy();
+    void rotateTowardsEnemy();
 
 
     bool destroyed;

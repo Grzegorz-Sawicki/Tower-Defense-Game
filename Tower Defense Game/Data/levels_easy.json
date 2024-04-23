@@ -1,7 +1,7 @@
 {
   "levels": [
     {
-      "type": "IMMUNE",
+      "type": "FLYING",
       "health": 20,
       "count": 20,
       "boss": false

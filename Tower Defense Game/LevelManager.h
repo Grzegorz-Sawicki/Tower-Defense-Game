@@ -10,7 +10,11 @@ private:
 	std::vector<Enemy*> *enemies;
 	Level* levels[50];
 
-	LevelScrollBox* levelScrollBox;
+	LevelScrollBox* levelScrollOutline;
+	std::vector<LevelScrollBox*> levelScrollBoxes;
+	sf::Time scrollTimer;
+	PausableClock scrollClock;
+	int currentScrollCount=0;
 
 	void handleJsonData();
 
@@ -34,7 +38,9 @@ public:
 	sf::Time getLevelTimer();
 	sf::Time getRemainingTime();
 	bool canSpawnEnemies();
-	LevelScrollBox& getLevelScrollBox();
+
+	LevelScrollBox& getLevelScrollOutline();
+	std::vector<LevelScrollBox*>& getLevelScrollBoxes();
 
 	void setSpawn(bool can);
 
