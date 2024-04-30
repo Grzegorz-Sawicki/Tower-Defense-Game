@@ -30,7 +30,7 @@ void LevelManager::handleJsonData()
 
 		lvlCount++;
 
-		this->levels[lvlCount-1] = new Level(*this->enemies, lvlCount, count, hp, type, boss);
+		this->levels.emplace_back(new Level(*this->enemies, lvlCount, count, hp, type, boss));
 		this->levelScrollBoxes.emplace_back(new LevelScrollBox(this->levels[lvlCount - 1], (lvlCount - 1) * Properties::levelScrollBoxSize.x));
 		
 	}
@@ -54,9 +54,22 @@ LevelManager::LevelManager(std::vector<Enemy*> &enemies) : enemies(&enemies)
 	this->nextLevel();
 }
 
+LevelManager::~LevelManager()
+{
+	for (auto* level : this->levels) {
+		delete level;
+	}
+
+	for (auto* box : this->levelScrollBoxes) {
+		delete box;
+	}
+
+	delete levelScrollOutline;
+}
+
 void LevelManager::nextLevel()
 {
-	if (this->currentLevel < 50) {
+	if (this->currentLevel < this->levels.size()) {
 		this->currentLevel++;
 		this->levelClock.restart();
 		this->getCurrentLevel()->activate();
@@ -139,7 +152,7 @@ void LevelManager::update()
 			level->update();
 		}
 
-		if (this->currentLevel < 50 && this->scrollClock.getElapsedTime() >= this->scrollTimer) {
+		if (this->currentLevel < this->levels.size() && this->scrollClock.getElapsedTime() >= this->scrollTimer) {
 			this->scrollClock.restart();
 			for (auto* lbox : this->levelScrollBoxes) {
 				lbox->move(sf::Vector2f(-1.f, 0.f));

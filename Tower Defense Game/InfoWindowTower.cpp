@@ -15,6 +15,7 @@ InfoWindowTower::InfoWindowTower(Tower& tower, bool mode) : tower(&tower)
 
 void InfoWindowTower::getTowerInfo()
 {
+	this->level = std::to_string(this->tower->getLevel());
 	this->name = this->tower->getName();
 	this->description = this->tower->getDescription();
 	this->cost = std::to_string(this->tower->getCost());
@@ -28,7 +29,7 @@ void InfoWindowTower::setupTexts()
 {
 	this->font = FontManager::instance().getFont("Fonts/PixellettersFull.ttf");
 
-	this->nameText = sf::Text(this->name + " Tower", this->font, 24U);
+	this->nameText = sf::Text(this->name + " Tower " + this->level, this->font, 24U);
 	this->nameText.setPosition(this->mainBox.getPosition() + sf::Vector2f(5.f, -5.f));
 	this->nameText.Bold;
 	this->nameText.setFillColor(sf::Color::Black);
@@ -87,6 +88,7 @@ void InfoWindowTower::getUpgradeInfo()
 {
 	TowerUpgrade nextUpgrade = this->tower->getNextUpgrade();
 
+	this->level = std::to_string(nextUpgrade.level);
 	this->name = this->tower->getName();
 	this->description = nextUpgrade.description;
 	this->cost = std::to_string(nextUpgrade.cost);

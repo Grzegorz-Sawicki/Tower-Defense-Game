@@ -8,7 +8,7 @@ class LevelManager
 {
 private:
 	std::vector<Enemy*> *enemies;
-	Level* levels[50];
+	std::vector<Level*> levels;
 
 	LevelScrollBox* levelScrollOutline;
 	std::vector<LevelScrollBox*> levelScrollBoxes;
@@ -29,6 +29,7 @@ private:
 
 public:
 	LevelManager(std::vector<Enemy*> &enemies);
+	~LevelManager();
 
 	void nextLevel();
 	void pause();

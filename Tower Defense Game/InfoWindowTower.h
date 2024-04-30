@@ -10,6 +10,7 @@ private:
 
 	sf::Font font;
 
+	std::string level;
 	std::string name;
 	std::string description;
 	std::string cost;

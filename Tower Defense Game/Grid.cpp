@@ -20,82 +20,7 @@ void Grid::moveToCorrectPlace()
 }
 
 Grid::Grid(std::vector<Enemy*>& enemies) : enemies(enemies) {
-	// Initialize tiles
-	m_tiles.reserve(m_rows);
-
-	for (unsigned int i = 0; i < m_rows; ++i) {
-		std::vector<Tile> row;
-		row.reserve(m_cols);
-		for (unsigned int j = 0; j < m_cols; ++j) {
-			if (i == 0 || i == m_rows - 1 || j == 0 || j == m_cols - 1) {
-				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, Properties::colorGridWall, TileType::WALL);
-			}
-			else {
-				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, Properties::colorGridTile, TileType::DEFAULT);
-			}
-		}
-		m_tiles.push_back(std::move(row));
-	}
-
-	for (unsigned int i = 0; i < m_rows; ++i) {
-		for (unsigned int j = 0; j < m_cols; ++j) {
-			m_tiles[i][j].setNeighbors(setupTileNeighbors(i, j));
-		}
-	}
-
-	//TODO: COLORS ARE SET ONLY WHEN CURSOR IN WINDOW
-
-	// set entrance tiles
-	//HORIZONTAL
-	for (size_t i = 0; i < 6; i++)
-	{
-		Tile* tmp = &m_tiles[i + 9][0];
-		tmp->setType(TileType::ENTRANCE);
-		tmp->setBaseColor(Properties::colorGridTile);
-		tmp->resetColor();
-		entranceTiles[Path::HORIZONTAL].emplace_back(tmp);
-	}
-
-	//set exit tiles
-	//HORIZONTAL
-	for (size_t i = 0; i < 3; i++)
-	{
-		Tile* tmp = &m_tiles[11 - i][m_cols - 1];
-		tmp->setType(TileType::EXIT);
-		tmp->setBaseColor(Properties::colorGridTile);
-		tmp->resetColor();
-		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
-
-		tmp = &m_tiles[12 + i][m_cols - 1];
-		tmp->setType(TileType::EXIT);
-		tmp->setBaseColor(Properties::colorGridTile);
-		tmp->resetColor();
-		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
-	}
-	//VERTICAL
-
-	//for (size_t i = 0; i < 8; i++)
-	//{
-	//	Tile* tmp = &m_tiles[0][i + 10];
-	//	tmp->setType(TileType::ENTRANCE);
-	//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
-	//	entranceTiles[Path::VERTICAL].emplace_back(tmp);
-	//}
-
-	//for (size_t i = 0; i < 4; i++)
-	//{
-	//	Tile* tmp = &m_tiles[m_rows - 1][13-i];
-	//	tmp->setType(TileType::EXIT);
-	//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
-	//	exitTiles[Path::VERTICAL].emplace_back(tmp);
-
-	//	tmp = &m_tiles[m_rows - 1][14+i];
-	//	tmp->setType(TileType::EXIT);
-	//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
-	//	exitTiles[Path::VERTICAL].emplace_back(tmp);
-	//}
-
-	this->moveToCorrectPlace();
+	Grid::resetTiles();
 }
 
 Grid& Grid::getInstance(std::vector<Enemy*>& enemies) {
@@ -193,6 +118,84 @@ std::map<Arrow, Tile*> Grid::setupTileNeighbors(int row, int col) {
 
 
 	return neighbors;
+}
+
+
+void Grid::resetTiles()
+{
+	m_tiles.clear();
+	entranceTiles.clear();
+	exitTiles.clear();
+
+	m_tiles.reserve(m_rows);
+	for (unsigned int i = 0; i < m_rows; ++i) {
+		std::vector<Tile> row;
+		row.reserve(m_cols);
+		for (unsigned int j = 0; j < m_cols; ++j) {
+			if (i == 0 || i == m_rows - 1 || j == 0 || j == m_cols - 1) {
+				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, Properties::colorGridWall, TileType::WALL);
+			}
+			else {
+				row.emplace_back(j, i, j * m_tileSize, i * m_tileSize, Properties::colorGridTile, TileType::DEFAULT);
+			}
+		}
+		m_tiles.push_back(std::move(row));
+	}
+
+	for (unsigned int i = 0; i < m_rows; ++i) {
+		for (unsigned int j = 0; j < m_cols; ++j) {
+			m_tiles[i][j].setNeighbors(setupTileNeighbors(i, j));
+		}
+	}
+
+	for (size_t i = 0; i < 6; i++)
+	{
+		Tile* tmp = &m_tiles[i + 9][0];
+		tmp->setType(TileType::ENTRANCE);
+		tmp->setBaseColor(Properties::colorGridTile);
+		tmp->resetColor();
+		entranceTiles[Path::HORIZONTAL].emplace_back(tmp);
+	}
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		Tile* tmp = &m_tiles[11 - i][m_cols - 1];
+		tmp->setType(TileType::EXIT);
+		tmp->setBaseColor(Properties::colorGridTile);
+		tmp->resetColor();
+		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
+
+		tmp = &m_tiles[12 + i][m_cols - 1];
+		tmp->setType(TileType::EXIT);
+		tmp->setBaseColor(Properties::colorGridTile);
+		tmp->resetColor();
+		exitTiles[Path::HORIZONTAL].emplace_back(tmp);
+	}
+
+	//VERTICAL
+
+//for (size_t i = 0; i < 8; i++)
+//{
+//	Tile* tmp = &m_tiles[0][i + 10];
+//	tmp->setType(TileType::ENTRANCE);
+//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+//	entranceTiles[Path::VERTICAL].emplace_back(tmp);
+//}
+
+//for (size_t i = 0; i < 4; i++)
+//{
+//	Tile* tmp = &m_tiles[m_rows - 1][13-i];
+//	tmp->setType(TileType::EXIT);
+//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+//	exitTiles[Path::VERTICAL].emplace_back(tmp);
+
+//	tmp = &m_tiles[m_rows - 1][14+i];
+//	tmp->setType(TileType::EXIT);
+//	tmp->setBaseColor(sf::Color(0, 0, 255, 100));
+//	exitTiles[Path::VERTICAL].emplace_back(tmp);
+//}
+
+	Grid::moveToCorrectPlace();
 }
 
 void Grid::resetPath(Path path) {
@@ -469,6 +472,7 @@ void Grid::visualizeOccupy() {
 	}
 	std::cout << "\n\n";
 }
+
 
 bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 {

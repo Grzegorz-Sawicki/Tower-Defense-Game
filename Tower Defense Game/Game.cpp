@@ -138,7 +138,9 @@ void Game::initUI()
 void Game::initVariables()
 {
 	this->paused = false;
-	this->lives = 30;
+	this->lives = 20;
+	this->gold = 80;
+	this->score = 0;
 }
 
 void Game::initGrid()
@@ -160,6 +162,8 @@ bool Game::mouseOnShape(sf::RectangleShape shape)
 
 void Game::reset()
 {
+	this->initVariables();
+
 	std::vector<Enemy*> enemiesCurrent = this->enemies;
 	for (auto* enemy : enemiesCurrent)
 	{
@@ -167,7 +171,8 @@ void Game::reset()
 		delete enemy;
 	}
 
-	for (auto* tower : this->towers)
+	std::vector<Tower*> towersCurrent = this->towers;
+	for (auto* tower : towersCurrent)
 	{
 		towers.erase(std::remove(towers.begin(), towers.end(), tower), towers.end());
 		delete tower;
@@ -175,7 +180,7 @@ void Game::reset()
 
 	delete this->levelManager;
 	this->levelManager = new LevelManager(this->enemies);
-
+	Grid::resetTiles();
 
 }
 

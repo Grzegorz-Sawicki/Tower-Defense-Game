@@ -37,6 +37,7 @@ public:
     static Tile* getNearestTile(sf::Vector2f position);
 
     static std::map<Arrow, Tile*> setupTileNeighbors(int row, int col);
+    static void resetTiles();
     static void resetPath(Path path);
     static void resetPaths();
     static void createPath(Path path);
