@@ -140,6 +140,7 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="InfoWindow.cpp" />
     <ClCompile Include="InfoWindowEnemy.cpp" />
+    <ClCompile Include="InfoWindowTower.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelManager.cpp" />
     <ClCompile Include="LevelScroll.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="include.h" />
     <ClInclude Include="InfoWindow.h" />
     <ClInclude Include="InfoWindowEnemy.h" />
+    <ClInclude Include="InfoWindowTower.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />
     <ClInclude Include="LevelScroll.h" />
@@ -176,6 +178,7 @@
     <None Include="Data\enemies.json" />
     <None Include="Data\levels_easy.json" />
     <None Include="Data\towers.json" />
+    <None Include="Data\tower_upgrades.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

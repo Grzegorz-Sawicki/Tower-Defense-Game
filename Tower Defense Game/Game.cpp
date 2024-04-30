@@ -62,11 +62,16 @@ void Game::initUI()
 	for (int i = 0; i < static_cast<int>(TowerType::ELEM_COUNT); i++) {
 		TowerType type = static_cast<TowerType>(i);
 
-		sf::Sprite* tmpTower = new sf::Sprite(TextureManager::instance().getTexture(static_cast<std::string>("Textures/tower_") + utils::towerToString(type) + "_barrel.png"));
-		sf::Sprite* tmpBase = new sf::Sprite(TextureManager::instance().getTexture("Textures/tower_base.png"));
+		Tower* dummyTower = new Tower(enemies, 0, 0, type);
+
+		sf::Sprite* tmpTower = &dummyTower->getSpriteBarrel();
+		tmpTower->setOrigin(sf::Vector2f(0,0));
+		sf::Sprite* tmpBase = &dummyTower->getSpriteBase();
+		tmpBase->setOrigin(sf::Vector2f(0, 0));
 
 		this->buttons.emplace_back(tmpTower);
 
+		dummyTowers[type] = dummyTower;
 		towerButtons[type] = tmpTower;
 		towerBases[type] = tmpBase;
 		towerButtons[type]->setPosition(Properties::buttonTowerPosition + static_cast<float>(i) * (Properties::towerSizeX + Properties::buttonTowerOffset));
@@ -146,6 +151,32 @@ void Game::initGrid()
 bool Game::mouseOnSprite(sf::Sprite sprite)
 {
 	return sprite.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window)));
+}
+
+bool Game::mouseOnShape(sf::RectangleShape shape)
+{
+	return shape.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window)));
+}
+
+void Game::reset()
+{
+	std::vector<Enemy*> enemiesCurrent = this->enemies;
+	for (auto* enemy : enemiesCurrent)
+	{
+		enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
+		delete enemy;
+	}
+
+	for (auto* tower : this->towers)
+	{
+		towers.erase(std::remove(towers.begin(), towers.end(), tower), towers.end());
+		delete tower;
+	}
+
+	delete this->levelManager;
+	this->levelManager = new LevelManager(this->enemies);
+
+
 }
 
 //Constructors and Destructors
@@ -234,7 +265,7 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (e.mouseButton.button == sf::Mouse::Left) {
-					//TOWER SELECTION
+					//TOWER BUTTON SELECTION
 					for (int i = 0; i < static_cast<int>(TowerType::ELEM_COUNT); i++) {
 						TowerType type = static_cast<TowerType>(i);
 						
@@ -243,10 +274,81 @@ void Game::updatePollEvents()
 							this->placeMode = true;
 						}
 					}
+
+					//TOWER UPGRADING
+					if (this->showInfoUpgrade) {
+						if (mouseOnShape(this->infoWindowUpgrade->getUpgradeButtonShape())) {
+							if (this->selectedTower->canUpgrade(this->gold)) {
+								this->selectedTower->upgrade(this->gold);
+								
+								std::cout << "UPGRADING" << std::endl;
+							}
+						}
+					}
+
+					//TOWER SELECT FOR INFO
+					for (const auto& pair : this->dummyTowers) {
+						TowerType key = pair.first;
+						Tower* tower = pair.second;
+
+						if (mouseOnSprite(tower->getSpriteBase())) {
+							delete this->infoWindowTower;
+							if (this->infoWindowUpgrade != nullptr) {
+								delete this->infoWindowUpgrade;
+								this->infoWindowUpgrade = nullptr;
+							}
+							this->infoWindowTower = new InfoWindowTower(*tower,0);
+							this->showInfoWindow = true;
+							this->showInfoTower = true;
+							tower->setShowRadiusCircle(true);
+							break;
+						}
+						this->showInfoTower = false;
+						this->showInfoTowerSell = false;
+						this->showInfoUpgrade = false;
+						tower->setShowRadiusCircle(false);
+					}
+					if (!this->showInfoTower) {
+						for (auto* tower : this->towers)
+						{
+							if (mouseOnSprite(tower->getSpriteBase())) {
+								this->selectedTower = tower;
+
+								delete this->infoWindowTower;
+								if (this->infoWindowUpgrade != nullptr) {
+									delete this->infoWindowUpgrade;
+									this->infoWindowUpgrade = nullptr;
+								}
+								this->infoWindowTower = new InfoWindowTower(*tower, 0);
+
+								if (tower->hasNextUpgrade()) {
+									this->infoWindowUpgrade = new InfoWindowTower(*tower, 1);
+									this->infoWindowUpgrade->setPosition(Properties::upgradeInfoBoxPosition);
+									this->showInfoUpgrade = true;
+								}
+
+								this->showInfoWindow = true;
+								this->showInfoTowerSell = true;
+								this->showInfoTower = true;
+								this->selectedTower->setShowRadiusCircle(true);
+								break;
+							}
+							this->showInfoTower = false;
+							this->showInfoTowerSell = false;
+							this->showInfoUpgrade = false;
+							tower->setShowRadiusCircle(false);
+						}
+					}
+
+
+
 					//TOWER PLACING
 					if (this->placeMode) {
-						if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window))) {
-							this->towers.push_back(Grid::getInstance(this->enemies).placeTower(sf::Mouse::getPosition(*this->window), this->placingTower));
+						unsigned int cost = this->dummyTowers[placingTower]->getCost();
+						if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window)) && this->gold >= cost) {
+							this->gold -= cost;
+							Tower* t = Grid::getInstance(this->enemies).placeTower(sf::Mouse::getPosition(*this->window), this->placingTower);
+							this->towers.push_back(t);
 							this->placeMode = false;
 
 							Grid::resetPaths();
@@ -255,16 +357,22 @@ void Game::updatePollEvents()
 						}
 					}
 
+
+
 					//ENEMY SELECT
 					for (auto* enemy : this->enemies)
 					{
 						if (mouseOnSprite(enemy->getSprite())) {
-							this->infoWindowEnemy = InfoWindowEnemy(*enemy);
+							delete this->infoWindowEnemy;
+							this->infoWindowEnemy = new InfoWindowEnemy(*enemy);
 							this->showInfoWindow = true;
+							this->showInfoEnemy = true;
 							break;
 						}
+						this->showInfoEnemy = false;
 					}
 
+					//BUTTONS 
 					if (mouseOnSprite(pauseButtonSprite)) {
 						this->paused = true;
 						this->levelManager->pause();
@@ -272,9 +380,22 @@ void Game::updatePollEvents()
 					if (mouseOnSprite(levelButtonSprite) && this->levelManager->canSpawnEnemies()) {
 						this->levelManager->nextLevel();
 					}
+					if (mouseOnSprite(resetButtonSprite)) {
+						this->reset();
+					}
 				}
 				break;
 			case sf::Event::KeyPressed:
+				if (e.key.code == sf::Keyboard::Escape) {
+					//PROBABLY WORKS
+					this->showInfoWindow = false;
+					this->showInfoTower = false;
+					this->showInfoTowerSell = false;
+					this->showInfoUpgrade = false;
+					this->showInfoEnemy = false;
+					this->placeMode = false;
+					Grid::handleMouseMove(sf::Vector2f(e.mouseMove.x, e.mouseMove.y));
+				}
 				if (e.key.code == sf::Keyboard::Space) {
 					this->levelManager->setSpawn(true);
 				}
@@ -309,6 +430,9 @@ void Game::updatePollEvents()
 				if (e.key.code == sf::Keyboard::Num6) {
 					this->placeMode = true;
 					this->placingTower = static_cast<TowerType>(5);
+				}
+				if (e.key.code == sf::Keyboard::G) {
+					this->gold += 10;
 				}
 
 			default:
@@ -347,7 +471,7 @@ void Game::update()
 
 		this->timer = this->levelManager->getRemainingTime().asSeconds();
 		this->textTime->setString(Properties::textTime + std::to_string(this->timer));
-
+		
 		this->level = this->levelManager->getLevel();
 		this->textLevel->setString(Properties::textLevel + std::to_string(this->level));
 
@@ -467,7 +591,15 @@ void Game::render()
 	}
 
 	if (this->showInfoWindow) {
-		this->infoWindowEnemy.render(this->window);
+		if (this->showInfoEnemy) this->infoWindowEnemy->render(this->window);
+		else if (this->showInfoTower) {
+			this->infoWindowTower->render(this->window);
+			if (this->showInfoTowerSell) this->infoWindowTower->renderSellButton(this->window);
+			if (this->showInfoUpgrade) {
+				this->infoWindowUpgrade->render(this->window);
+				this->infoWindowUpgrade->renderUpgradeButton(this->window);
+			}
+		}
 	}
 
 

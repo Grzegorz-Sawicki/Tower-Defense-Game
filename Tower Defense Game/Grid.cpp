@@ -530,6 +530,12 @@ bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 		}
 	}
 
+	for (int i = row; i <= row + 1; ++i) {
+		for (int j = col; j <= col + 1; ++j) {
+			m_tiles[i][j].setType(TileType::DEFAULT);
+		}
+	}
+
 	return true;
 }
 

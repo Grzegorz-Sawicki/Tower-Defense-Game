@@ -120,4 +120,46 @@ namespace utils
         else if (type == "SPAWNED") return EnemyType::SPAWNED;
     }
 
+    inline std::string wrapText(const std::string& text, unsigned int width, const sf::Font& font) {
+        std::stringstream ss(text);
+        std::string line;
+        std::string wrappedText;
+        unsigned int lineWidth = 0;
+
+        while (std::getline(ss, line, ' ')) {
+            sf::Text tempText(line, font);
+            lineWidth += tempText.getLocalBounds().width;
+
+            if (lineWidth >= width) {
+                wrappedText += "\n";
+                lineWidth = tempText.getLocalBounds().width;
+            }
+
+            wrappedText += line + " ";
+        }
+
+        return wrappedText;
+    }
+
+    inline json handleJson(std::string fileName) {
+        std::ifstream file(fileName);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open JSON file." << std::endl;
+            system("pause");
+        }
+
+        json jsonData;
+        try {
+            file >> jsonData;
+        }
+        catch (json::parse_error& e) {
+            std::cerr << "Parse error: " << e.what() << std::endl;
+            system("pause");
+        }
+
+        file.close();
+
+        return jsonData;
+    }
+
 }

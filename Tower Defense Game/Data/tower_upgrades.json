@@ -1,0 +1,71 @@
+{
+  "towerUpgrades": [
+    {
+      "name": "Pellet",
+      "upgrades": [
+        {
+          "level": 2,
+          "description": "Adds more damage",
+          "cost": 5,
+          "damage": 20,
+          "range": 60,
+          "speedStr": "slow"
+        },
+        {
+          "level": 3,
+          "description": "Adds more damage",
+          "cost": 10,
+          "damage": 40,
+          "range": 60,
+          "speedStr": "slow"
+        },
+        {
+          "level": 4,
+          "description": "Adds more damage",
+          "cost": 20,
+          "damage": 80,
+          "range": 60,
+          "speedStr": "slow"
+        },
+        {
+          "level": 5,
+          "description": "Adds more damage",
+          "cost": 40,
+          "damage": 160,
+          "range": 60,
+          "speedStr": "slow"
+        },
+        {
+          "level": 6,
+          "description": "Turns into a sniper tower. Final upgrade",
+          "cost": 120,
+          "damage": 400,
+          "range": 180,
+          "speedStr": "very slow"
+        }
+      ]
+         
+    },
+    {
+      "name": "Squirt"
+    },
+    {
+      "name": "Dart"
+      
+    },
+    {
+      "name": "Swarm"
+      
+
+    },
+    {
+      "name": "Frost"
+      
+    },
+    {
+      "name": "Bash"
+      
+      
+    }
+  ]
+}

@@ -2,31 +2,19 @@
 
 void Tower::handleJsonData()
 {
-	std::ifstream file(Properties::jsonTowersFileName);
-	if (!file.is_open()) {
-		std::cerr << "Failed to open JSON file." << std::endl;
-		system("pause");
-	}
-
-	json jsonData;
-	try {
-		file >> jsonData;
-	}
-	catch (json::parse_error& e) {
-		std::cerr << "Parse error: " << e.what() << std::endl;
-		system("pause");
-	}
-
-	file.close();
+	json jsonData = utils::handleJson(Properties::jsonTowersFileName);
+	json upgradeData = utils::handleJson(Properties::jsonUpgradesFileName);
 
 	json towers = jsonData["towers"];
 
 	json tower = towers[static_cast<int>(type)];
+	this->name = tower["name"];
 	this->damage = tower["damage"];
 	this->cost = tower["cost"];
 	this->range = tower["range"];
 	this->shootSpeed = tower["shootSpeed"];
 	this->speedStr = tower["speedStr"];
+	this->description = tower["description"];
 
 	this->projectileData = tower["projectileData"];
 	this->effects = tower["effects"];
@@ -69,6 +57,15 @@ void Tower::handleJsonData()
 		}
 	}
 
+	json towerUpgrades = upgradeData["towerUpgrades"];
+	json towerUpgrade = towerUpgrades[static_cast<int>(type)];
+	json upgrades = towerUpgrade["upgrades"];
+
+	for (json upgrade : upgrades) {
+		this->towerUpgrades.emplace_back(TowerUpgrade(upgrade));
+	}
+
+
 	this->initSprites(tower["texture"]);
 }
 
@@ -83,6 +80,20 @@ void Tower::initSprites(json texture)
 	this->spriteBarrel.setTexture(TextureManager::instance().getTexture(texture));
 	this->spriteBarrel.setPosition(this->posX, this->posY);
 	this->spriteBarrel.setOrigin(this->spriteBarrel.getGlobalBounds().width / 2, this->spriteBarrel.getGlobalBounds().height / 2);
+
+
+}
+
+void Tower::initText()
+{
+	//upgrade text
+	this->font = FontManager::instance().getFont("Fonts/PixellettersFull.ttf");
+	this->upgradeText = sf::Text("0", this->font, 22);
+	this->upgradeText.setFillColor(sf::Color::Black);
+
+	sf::FloatRect textRect = upgradeText.getLocalBounds();
+	upgradeText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+	upgradeText.setPosition(this->spriteBase.getPosition());
 }
 
 void Tower::initRadiusCircle()
@@ -112,12 +123,19 @@ void Tower::rotateTowardsEnemy(Enemy* enemy)
 	this->spriteBarrel.setRotation(angle);
 }
 
+sf::Time Tower::getNextUpgradeLength()
+{
+	return sf::seconds(Properties::towerUpgradeBaseTime + (this->level - 1) * Properties::towerUpgradeIncreaseTime);
+}
+
 Tower::Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType type) : enemies(enemies), posX(posX), posY(posY), type(type)
 {
 	this->handleJsonData();
+	this->initText();
 	this->initRadiusCircle();
 
-	this->shootInterval = sf::seconds(1.f / shootSpeed);
+	this->sellPrice = this->cost * 0.75;
+;	this->shootInterval = sf::seconds(1.f / shootSpeed);
 	this->shootTimer = this->shootInterval;
 	this->targetEnemy = nullptr;
 	this->targetEnemyDead = false;
@@ -149,40 +167,149 @@ TowerType Tower::getType()
 	return this->type;
 }
 
+sf::Sprite& Tower::getSpriteBase()
+{
+	return this->spriteBase;
+}
+
+sf::Sprite& Tower::getSpriteBarrel()
+{
+	return this->spriteBarrel;
+}
+
+
+
+std::string Tower::getName()
+{
+	return this->name;
+}
+
+int Tower::getLevel()
+{
+	return this->level;
+}
+
+int Tower::getCost()
+{
+	return this->cost;
+}
+
+int Tower::getDamage()
+{
+	return this->damage;
+}
+
+int Tower::getRange()
+{
+	return this->range;
+}
+
+std::string Tower::getSpeedStr()
+{
+	return this->speedStr;
+}
+
+int Tower::getSellPrice()
+{
+	return this->sellPrice;
+}
+
+std::string Tower::getDescription()
+{
+	return this->description;
+}
+
+void Tower::setShowRadiusCircle(bool show)
+{
+	this->showRadiusCircle = show;
+}
+
+TowerUpgrade Tower::getNextUpgrade()
+{
+	return this->towerUpgrades[this->level - 1];
+}
+
+void Tower::upgrade(unsigned int& gold)
+{
+	this->upgradeTime = this->getNextUpgradeLength();
+	this->upgrading = true;
+	this->upgradeClock.restart();
+
+	TowerUpgrade upgrade = this->towerUpgrades[this->level - 1];
+	this->level++;
+	this->cost += upgrade.cost;
+	this->damage = upgrade.damage;
+	this->range = upgrade.range;
+	this->radiusCircle.setRadius(this->range);
+	this->radiusCircle.setOrigin(this->range, this->range);
+	this->speedStr = upgrade.speedStr;
+	if(!upgrade.shootSpeed) this->shootSpeed = upgrade.shootSpeed;
+	if(!upgrade.stunChance) this->stunChance = upgrade.stunChance;
+	if(!upgrade.slowValue) this->slowValue = upgrade.slowValue;
+	if(!upgrade.aoeRange) this->aoeRange = upgrade.aoeRange;
+
+	gold -= upgrade.cost;
+}
+
+bool Tower::canUpgrade(unsigned int& gold)
+{
+	if (this->hasNextUpgrade()) {
+		if (this->getNextUpgrade().cost <= gold) return true;
+		else return false;
+	}
+	return false;
+}
+
+bool Tower::hasNextUpgrade()
+{
+	if (this->level < this->towerUpgrades.size() + 1) return true;
+	return false;
+}
+
 void Tower::update()
 {
 	if (this->targetEnemy != nullptr && this->targetEnemy->isDead()) {
 		this->targetEnemyDead = true;
 	}
 
-	if (this->shootTimer >= this->shootInterval) {
-		int targetedEnemiesCount = 0;
-		std::vector<Enemy*> targetedEnemies;
+	if (!this->upgrading) {
+		if (this->shootTimer >= this->shootInterval) {
+			int targetedEnemiesCount = 0;
+			std::vector<Enemy*> targetedEnemies;
 
-		for (auto& enemy : this->enemies) {
-			float distance = std::sqrt(std::pow(enemy->getPosition().x - this->getPosition().x, 2) + std::pow(enemy->getPosition().y - this->getPosition().y, 2));
-			if (distance <= this->range) {
-				if (this->antiAir && enemy->getType() == EnemyType::FLYING || !this->antiAir) {
-					this->enemyDetected = true;
-					this->targetEnemy = enemy;
-					this->targetEnemyDead = false;
+			for (auto& enemy : this->enemies) {
+				float distance = std::sqrt(std::pow(enemy->getPosition().x - this->getPosition().x, 2) + std::pow(enemy->getPosition().y - this->getPosition().y, 2));
+				if (distance <= this->range) {
+					if (this->antiAir && enemy->getType() == EnemyType::FLYING || !this->antiAir) {
+						this->enemyDetected = true;
+						this->targetEnemy = enemy;
+						this->targetEnemyDead = false;
 
-					targetedEnemies.emplace_back(enemy);
-					targetedEnemiesCount++;
+						targetedEnemies.emplace_back(enemy);
+						targetedEnemiesCount++;
 
-					this->shoot(enemy);
-					this->shootTimer = sf::Time::Zero;
+						this->shoot(enemy);
+						this->shootTimer = sf::Time::Zero;
 
-					if (this->enemyDetected && targetedEnemiesCount == this->projectileCount) break;
+						if (this->enemyDetected && targetedEnemiesCount == this->projectileCount) break;
+					}
+
 				}
-
 			}
+
 		}
 
+		if (this->targetEnemy != nullptr && !this->targetEnemyDead && !this->isBash && this->type != TowerType::SWARM)
+			this->rotateTowardsEnemy(this->targetEnemy);
 	}
-
-	if (this->targetEnemy != nullptr && !this->targetEnemyDead && !this->isBash && this->type != TowerType::SWARM)
-		this->rotateTowardsEnemy(this->targetEnemy);
+	else {
+		sf::Time remainingTime = this->upgradeTime - this->upgradeClock.getElapsedTime();
+		int remainingTimeInt = static_cast<int>(remainingTime.asSeconds()+1);
+		this->upgradeText.setString(std::to_string(remainingTimeInt));
+		if (this->upgradeClock.getElapsedTime() >= this->upgradeTime) {
+			this->upgrading = false;
+		}
+	}
 
 	this->updateProjectiles();
 
@@ -207,8 +334,11 @@ void Tower::updateProjectiles()
 void Tower::render(sf::RenderTarget* target)
 {
 	target->draw(this->spriteBase);
-	target->draw(this->spriteBarrel);
-	target->draw(this->radiusCircle);
+
+	if (this->upgrading) target->draw(this->upgradeText);
+	else target->draw(this->spriteBarrel);
+
+	if(this->showRadiusCircle) target->draw(this->radiusCircle);
 }
 
 void Tower::renderProjectiles(sf::RenderTarget* target)
@@ -217,4 +347,24 @@ void Tower::renderProjectiles(sf::RenderTarget* target)
 	{
 		projectile->render(target);
 	}
+}
+
+TowerUpgrade::TowerUpgrade()
+{
+
+}
+
+TowerUpgrade::TowerUpgrade(json upgradeJson)
+{
+	this->cost = upgradeJson["cost"];
+	this->damage = upgradeJson["damage"];
+	this->description = upgradeJson["description"];
+	this->level = upgradeJson["level"];
+	this->speedStr = upgradeJson["speedStr"];
+	this->range = upgradeJson["range"];
+
+	if (!upgradeJson["aoeRange"].is_null()) this->aoeRange = upgradeJson["aoeRange"];
+	if (!upgradeJson["slowValue"].is_null()) this->slowValue = upgradeJson["slowValue"];
+	if (!upgradeJson["stunChance"].is_null()) this->stunChance = upgradeJson["stunChance"];
+	if (!upgradeJson["shootSpeed"].is_null()) this->shootSpeed = upgradeJson["shootSpeed"];
 }

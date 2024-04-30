@@ -49,6 +49,7 @@ struct Properties
 	static sf::Vector2f textPausePosition;
 
 	static std::string jsonTowersFileName;
+	static std::string jsonUpgradesFileName;
 	static std::string jsonEnemiesFileName;
 	static std::string jsonLevelsEasyFileName;
 
@@ -59,6 +60,7 @@ struct Properties
 	static sf::Vector2f subInfoBoxPosition;
 	static sf::Vector2f subInfoBoxSize;
 	static sf::Color subInfoBoxBgColor;
+	static sf::Vector2f upgradeInfoBoxPosition;
 
 	static sf::Color gray;
 	static sf::Color darkGray;
@@ -72,6 +74,9 @@ struct Properties
 	static sf::Color levelScrollFastColor;
 	static sf::Color levelScrollSpawnColor;
 	static sf::Color levelScrollFlyingColor;
+
+	static float towerUpgradeBaseTime;
+	static float towerUpgradeIncreaseTime;
 };
 
 

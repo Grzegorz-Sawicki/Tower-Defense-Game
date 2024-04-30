@@ -16,6 +16,13 @@ InfoWindow::InfoWindow()
 	this->setupBoxes();
 }
 
+void InfoWindow::setPosition(sf::Vector2f pos)
+{
+	sf::Vector2f offset = pos - this->mainBox.getPosition();
+	this->mainBox.move(offset);
+	this->statBox.move(offset);
+}
+
 void InfoWindow::update()
 {
 }

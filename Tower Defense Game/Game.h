@@ -8,6 +8,7 @@
 #include "FontManager.hpp"
 #include "LevelManager.h"
 #include "InfoWindowEnemy.h"
+#include "InfoWindowTower.h"
 
 class Game
 {
@@ -42,9 +43,17 @@ private:
 	sf::Sprite muteButtonSprite;
 	sf::Texture muteButtonTexture;
 
-	InfoWindowEnemy infoWindowEnemy;
+	InfoWindowEnemy* infoWindowEnemy;
+	InfoWindowTower* infoWindowTower;
+	InfoWindowTower* infoWindowUpgrade;
 	bool showInfoWindow = false;
+	bool showInfoTowerSell = false;
+	bool showInfoTower = false;
+	bool showInfoUpgrade = false;
+	bool showInfoEnemy = false;
+	Tower* selectedTower;
 
+	std::map<TowerType, Tower*> dummyTowers;
 	std::map<TowerType, sf::Sprite*> towerButtons;
 	std::map<TowerType, sf::Sprite*> towerBases;
 
@@ -84,6 +93,9 @@ private:
 	void initGrid();
 
 	bool mouseOnSprite(sf::Sprite sprite);
+	bool mouseOnShape(sf::RectangleShape shape);
+
+	void reset();
 
 	sf::Clock clock;
 

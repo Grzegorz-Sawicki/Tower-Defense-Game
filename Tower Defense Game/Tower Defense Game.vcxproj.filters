@@ -81,6 +81,9 @@
     <ClCompile Include="FontManager.cpp">
       <Filter>Pliki źródłowe\UTIL_MANAGERS</Filter>
     </ClCompile>
+    <ClCompile Include="InfoWindowTower.cpp">
+      <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -137,6 +140,9 @@
     <ClInclude Include="FontManager.hpp">
       <Filter>Pliki nagłówkowe\UTIL_MANAGERS</Filter>
     </ClInclude>
+    <ClInclude Include="InfoWindowTower.h">
+      <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\towers.json">
@@ -146,6 +152,9 @@
       <Filter>Pliki zasobów</Filter>
     </None>
     <None Include="Data\levels_easy.json">
+      <Filter>Pliki zasobów</Filter>
+    </None>
+    <None Include="Data\tower_upgrades.json">
       <Filter>Pliki zasobów</Filter>
     </None>
   </ItemGroup>

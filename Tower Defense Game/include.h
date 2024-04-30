@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iomanip>
 #include <mutex>
+#include <sstream>
 
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"

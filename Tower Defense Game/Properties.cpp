@@ -45,6 +45,7 @@ std::string Properties::textPause = "Paused: ";
 sf::Vector2f Properties::textPausePosition = sf::Vector2f(230.f, 260.f);
 
 std::string	Properties::jsonTowersFileName = "Data/towers.json";
+std::string Properties::jsonUpgradesFileName = "Data/tower_upgrades.json";
 std::string	Properties::jsonEnemiesFileName = "Data/enemies.json";
 std::string	Properties::jsonLevelsEasyFileName = "Data/levels_easy.json";
 
@@ -55,6 +56,7 @@ sf::Color Properties::mainInfoBoxBgColor = sf::Color(180.f, 180.f, 180.f);
 sf::Vector2f Properties::subInfoBoxPosition = sf::Vector2f(652.f, 200.f);
 sf::Vector2f Properties::subInfoBoxSize = sf::Vector2f(150.f, 108.f);
 sf::Color Properties::subInfoBoxBgColor = sf::Color(236, 129, 57);
+sf::Vector2f Properties::upgradeInfoBoxPosition = sf::Vector2f(630.f, 354.f);
 
 sf::Color Properties::gray = sf::Color(200,200,200);
 sf::Color Properties::darkGray = sf::Color(100, 100, 100);
@@ -68,3 +70,6 @@ sf::Color Properties::levelScrollImmuneColor = sf::Color(170,0,170);
 sf::Color Properties::levelScrollFastColor = sf::Color(170,0,0);
 sf::Color Properties::levelScrollSpawnColor = sf::Color(0,85,0);
 sf::Color Properties::levelScrollFlyingColor = sf::Color(170,170,0);
+
+float Properties::towerUpgradeBaseTime = 1.5;
+float Properties::towerUpgradeIncreaseTime = 3;

@@ -2,6 +2,7 @@
   "towers": [
     {
       "name": "Pellet",
+      "description": "Cheap tower that fires pellets.",
       "damage": 10,
       "default_damage": 10,
       "cost": 5,
@@ -19,6 +20,7 @@
     },
     {
       "name": "Squirt",
+      "description": "Quick firing tower that upgrades well.",
       "damage": 5,
       "cost": 15,
       "range": 70,
@@ -37,6 +39,7 @@
     },
     {
       "name": "Dart",
+      "description": "Slow firing tower that damages an area on the ground.",
       "damage": 8,
       "cost": 20,
       "range": 90,
@@ -61,6 +64,7 @@
     },
     {
       "name": "Swarm",
+      "description": "Anti-air tower that fires 4 missiles at a time.",
       "damage": 5,
       "cost": 50,
       "range": 60,
@@ -88,6 +92,7 @@
     },
     {
       "name": "Frost",
+      "description": "This tower freezes creeps to slow them down.",
       "damage": 2,
       "default_damage": 10,
       "cost": 50,
@@ -118,6 +123,7 @@
     },
     {
       "name": "Bash",
+      "description": "Damages the ground around it, plus a chance to stun.",
       "damage": 1,
       "cost": 30,
       "range": 80,

@@ -9,10 +9,10 @@ private:
 	Enemy* enemy;
 
 	std::string name;
-	std::string flying = "Flying";
-	std::string immune = "Immune";
-	std::string health = "Health";
-	std::string speed = "Speed";
+	std::string flying = "Flying:";
+	std::string immune = "Immune:";
+	std::string health = "Health:";
+	std::string speed = "Speed:";
 
 	std::string flyingVal;
 	std::string immuneVal;
