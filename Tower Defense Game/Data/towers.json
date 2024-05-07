@@ -4,15 +4,14 @@
       "name": "Pellet",
       "description": "Cheap tower that fires pellets.",
       "damage": 10,
-      "default_damage": 10,
       "cost": 5,
       "range": 60,
-      "shootSpeed": 1.0,
+      "shootSpeed": 0.66,
       "speedStr": "slow",
       "effects": [],
       "texture": "textures/tower_pellet_barrel.png",
       "projectileData": {
-        "speed": 2.0,
+        "speed": 3.0,
         "moveType": 0,
         "rotate": false,
         "texture": "textures/projectile_pellet.png"
@@ -24,14 +23,14 @@
       "damage": 5,
       "cost": 15,
       "range": 70,
-      "shootSpeed": 4.0,
+      "shootSpeed": 2.5,
       "speedStr": "fast",
       "effects": [],
 
       "texture": "textures/tower_squirt_barrel.png",
 
       "projectileData": {
-        "speed": 2.0,
+        "speed": 3.0,
         "moveType": 0,
         "rotate": true,
         "texture": "textures/projectile_squirt.png"
@@ -43,20 +42,20 @@
       "damage": 8,
       "cost": 20,
       "range": 90,
-      "shootSpeed": 1,
+      "shootSpeed": 0.45,
       "speedStr": "very slow",
 
       "effects": [
         {
           "name": "aoe",
-          "range": 50.0
+          "range": 40.0
         }
       ],
 
       "texture": "textures/tower_dart_barrel.png",
 
       "projectileData": {
-        "speed": 1.5,
+        "speed": 3.0,
         "moveType": 1,
         "rotate": false,
         "texture": "textures/projectile_dart.png"
@@ -65,7 +64,7 @@
     {
       "name": "Swarm",
       "description": "Anti-air tower that fires 4 missiles at a time.",
-      "damage": 5,
+      "damage": 20,
       "cost": 50,
       "range": 60,
       "shootSpeed": 2,
@@ -84,7 +83,7 @@
       "texture": "textures/tower_swarm_barrel.png",
 
       "projectileData": {
-        "speed": 2.0,
+        "speed": 3.0,
         "moveType": 0,
         "rotate": false,
         "texture": "textures/projectile_swarm.png"
@@ -93,11 +92,10 @@
     {
       "name": "Frost",
       "description": "This tower freezes creeps to slow them down.",
-      "damage": 2,
-      "default_damage": 10,
+      "damage": 10,
       "cost": 50,
       "range": 50,
-      "shootSpeed": 2.0,
+      "shootSpeed": 0.66,
       "speedStr": "slow",
 
       "effects": [
@@ -107,7 +105,7 @@
         },
         {
           "name": "slow",
-          "value": 0.4,
+          "value": 0.2,
           "length": 2.0
         }
       ],
@@ -115,7 +113,7 @@
       "texture": "textures/tower_frost_barrel.png",
 
       "projectileData": {
-        "speed": 2.0,
+        "speed": 3.0,
         "moveType": 0,
         "rotate": true,
         "texture": "textures/projectile_frost.png"
@@ -126,18 +124,18 @@
       "description": "Damages the ground around it, plus a chance to stun.",
       "damage": 1,
       "cost": 30,
-      "range": 80,
-      "shootSpeed": 5,
+      "range": 40,
+      "shootSpeed": 0.6,
       "speedStr": "slow",
 
       "effects": [
         {
           "name": "aoe",
-          "range": 100.0
+          "range": 40.0
         },
         {
           "name": "stun",
-          "chance": 0.25,
+          "chance": 0.0,
           "length": 2.0
         },
         {

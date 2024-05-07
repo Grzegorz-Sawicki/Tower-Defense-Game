@@ -47,25 +47,256 @@
          
     },
     {
-      "name": "Squirt"
+      "name": "Squirt",
+      "upgrades": [
+        {
+          "level": 2,
+          "description": "Adds more damage",
+          "cost": 12,
+          "damage": 10,
+          "range": 70,
+          "speedStr": "fast"
+        },
+        {
+          "level": 3,
+          "description": "Adds more damage",
+          "cost": 23,
+          "damage": 18,
+          "range": 70,
+          "speedStr": "fast"
+        },
+        {
+          "level": 4,
+          "description": "Adds more damage",
+          "cost": 35,
+          "damage": 34,
+          "range": 70,
+          "speedStr": "fast"
+        },
+        {
+          "level": 5,
+          "description": "Adds more damage",
+          "cost": 75,
+          "damage": 65,
+          "range": 70,
+          "speedStr": "fast"
+        },
+        {
+          "level": 6,
+          "description": "Increases damage and range. Final upgrade",
+          "cost": 290,
+          "damage": 320,
+          "range": 90,
+          "speedStr": "fast"
+        }
+      ]
     },
     {
-      "name": "Dart"
-      
+      "name": "Dart",
+      "upgrades": [
+        {
+          "level": 2,
+          "description": "Increases damage, splash and range",
+          "cost": 15,
+          "damage": 16,
+          "range": 100,
+          "speedStr": "very slow",
+          "aoeRange": 50.0
+        },
+        {
+          "level": 3,
+          "description": "Increases damage, splash and range",
+          "cost": 35,
+          "damage": 32,
+          "range": 110,
+          "speedStr": "very slow",
+          "aoeRange": 60.0
+        },
+        {
+          "level": 4,
+          "description": "Increases damage, splash and range",
+          "cost": 60,
+          "damage": 64,
+          "range": 120,
+          "speedStr": "very slow",
+          "aoeRange": 70.0
+        },
+        {
+          "level": 5,
+          "description": "Increases damage, splash and range",
+          "cost": 110,
+          "damage": 128,
+          "range": 130,
+          "speedStr": "very slow",
+          "aoeRange": 80.0
+        },
+        {
+          "level": 6,
+          "description": "Increases damage, splash and range. Final upgrade.",
+          "cost": 160,
+          "damage": 256,
+          "range": 140,
+          "speedStr": "very slow",
+          "aoeRange": 100.0
+        }
+      ]
     },
     {
-      "name": "Swarm"
-      
+      "name": "Swarm",
+      "upgrades": [
+        {
+          "level": 2,
+          "description": "Adds more damage",
+          "cost": 30,
+          "damage": 40,
+          "range": 60,
+          "speedStr": "average"
+        },
+        {
+          "level": 3,
+          "description": "Adds more damage, range",
+          "cost": 50,
+          "damage": 80,
+          "range": 65,
+          "speedStr": "average"
+        },
+        {
+          "level": 4,
+          "description": "Adds more damage",
+          "cost": 75,
+          "damage": 160,
+          "range": 60,
+          "speedStr": "average"
+        },
+        {
+          "level": 5,
+          "description": "Adds more damage, range",
+          "cost": 125,
+          "damage": 320,
+          "range": 70,
+          "speedStr": "average"
+        },
+        {
+          "level": 6,
+          "description": "Adds more damage, range. Final upgrade.",
+          "cost": 310,
+          "damage": 480,
+          "range": 75,
+          "speedStr": "fast"
+        }
+      ]
 
     },
     {
-      "name": "Frost"
-      
+      "name": "Frost",
+      "upgrades": [
+        {
+          "level": 2,
+          "description": "Increases splash and slow",
+          "cost": 25,
+          "damage": 15,
+          "range": 50,
+          "speedStr": "slow",
+          "aoeRange": 30.0,
+          "slowValue": 0.25
+        },
+        {
+          "level": 3,
+          "description": "Increases splash and slow",
+          "cost": 25,
+          "damage": 20,
+          "range": 50,
+          "speedStr": "slow",
+          "aoeRange": 40.0,
+          "slowValue": 0.3
+        },
+        {
+          "level": 4,
+          "description": "Increases splash and slow",
+          "cost": 25,
+          "damage": 25,
+          "range": 50,
+          "speedStr": "slow",
+          "aoeRange": 50.0,
+          "slowValue": 0.35
+        },
+        {
+          "level": 5,
+          "description": "Increases splash and slow",
+          "cost": 25,
+          "damage": 30,
+          "range": 50,
+          "speedStr": "slow",
+          "aoeRange": 60.0,
+          "slowValue": 0.4
+        },
+        {
+          "level": 6,
+          "description": "Increases splash, slow and range. Final upgrade.",
+          "cost": 50,
+          "damage": 40,
+          "range": 75,
+          "speedStr": "slow",
+          "aoeRange": 70.0,
+          "slowValue": 0.5
+        }
+      ]
     },
     {
-      "name": "Bash"
-      
-      
+      "name": "Bash",
+      "upgrades": [
+        {
+          "level": 2,
+          "description": "7% stun, increases damage",
+          "cost": 25,
+          "damage": 20,
+          "range": 40,
+          "speedStr": "slow",
+          "aoeRange": 40.0,
+          "stunChance": 0.07
+        },
+        {
+          "level": 3,
+          "description": "10% stun, increases damage",
+          "cost": 50,
+          "damage": 40,
+          "range": 40,
+          "speedStr": "slow",
+          "aoeRange": 40.0,
+          "stunChance": 0.1
+        },
+        {
+          "level": 4,
+          "description": "13% stun, increases damage",
+          "cost": 100,
+          "damage": 80,
+          "range": 40,
+          "speedStr": "slow",
+          "aoeRange": 40.0,
+          "stunChance": 0.13
+        },
+        {
+          "level": 5,
+          "description": "15% stun, increases damage",
+          "cost": 185,
+          "damage": 160,
+          "range": 40,
+          "speedStr": "slow",
+          "aoeRange": 40.0,
+          "stunChance": 0.15
+        },
+        {
+          "level": 6,
+          "description": "20% stun, increases damage. Final upgrade.",
+          "cost": 355,
+          "damage": 320,
+          "range": 40,
+          "speedStr": "slow",
+          "aoeRange": 40.0,
+          "stunChance": 0.2
+        }
+      ]
+
     }
   ]
 }

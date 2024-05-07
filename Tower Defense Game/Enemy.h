@@ -21,6 +21,8 @@ private:
 	int maxhp;
 	float moveSpeed;
 	float moveSpeedBase;
+	int gold = 0;
+	int level = 0;
 
 	bool boss;
 	bool group=false;
@@ -60,13 +62,20 @@ private:
 
 
 public:
-	Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss);
+	Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss, int gold, int level);
 	Enemy(const Enemy& other, sf::Vector2f offset);
 	virtual ~Enemy();
 
 	sf::Vector2f getPosition(bool ignoreOffset=false);
 	sf::Vector2f getPositionOffset();
 	sf::FloatRect getBounds();
+
+	bool getFlying();
+	bool getImmune();
+	float getSpeedBase();
+
+	int getLevel();
+	int getGold();
 	int getHp();
 	int getMaxHp();
 	bool isDead();

@@ -151,6 +151,11 @@ sf::RectangleShape& InfoWindowTower::getUpgradeButtonShape()
 	return this->upgradeButton;
 }
 
+sf::RectangleShape& InfoWindowTower::getSellButtonShape()
+{
+	return this->sellButton;
+}
+
 void InfoWindowTower::renderSellButton(sf::RenderTarget* target)
 {
 	target->draw(this->sellButton);

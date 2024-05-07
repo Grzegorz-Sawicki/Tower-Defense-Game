@@ -24,13 +24,14 @@ void LevelManager::handleJsonData()
 	int lvlCount = 0;
 	for (auto level : levels) {
 		EnemyType type = utils::stringToEnemyType(level["type"]);
+		int gold = level["gold"];
 		int hp = level["health"];
 		int count = level["count"];
 		bool boss = level["boss"];
 
 		lvlCount++;
 
-		this->levels.emplace_back(new Level(*this->enemies, lvlCount, count, hp, type, boss));
+		this->levels.emplace_back(new Level(*this->enemies, gold, lvlCount, count, hp, type, boss));
 		this->levelScrollBoxes.emplace_back(new LevelScrollBox(this->levels[lvlCount - 1], (lvlCount - 1) * Properties::levelScrollBoxSize.x));
 		
 	}

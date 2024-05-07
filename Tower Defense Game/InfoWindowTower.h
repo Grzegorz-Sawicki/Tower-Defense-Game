@@ -52,6 +52,7 @@ public:
 
 	void setPosition(sf::Vector2f pos);
 	sf::RectangleShape& getUpgradeButtonShape();
+	sf::RectangleShape& getSellButtonShape();
 
 	void render(sf::RenderTarget* target);
 	void renderSellButton(sf::RenderTarget* target);

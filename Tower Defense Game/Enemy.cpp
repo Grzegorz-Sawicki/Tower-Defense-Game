@@ -160,7 +160,7 @@ sf::Vector2f Enemy::createSpawnOffset()
 	}
 }
 
-Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss) : path(path), type(type), boss(boss)
+Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss, int gold, int level) : path(path), type(type), boss(boss), gold(gold), level(level)
 {
 	this->handleJsonData();
 
@@ -180,6 +180,8 @@ Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyT
 
 Enemy::Enemy(const Enemy& other, sf::Vector2f offset)
 {
+	this->level = other.level;
+	this->gold = 0;
 	this->boss = other.boss;
 	this->currentArrow = other.currentArrow;
 	this->currentTile = other.currentTile;
@@ -315,6 +317,11 @@ bool Enemy::isBoss()
 	return this->boss;
 }
 
+int Enemy::getGold()
+{
+	return this->gold;
+}
+
 void Enemy::setStun(float length)
 {
 	this->stunned = true;
@@ -335,6 +342,16 @@ void Enemy::takeDamage(int damage)
 	}
 }
 
+int Enemy::getLevel()
+{
+	return this->level;
+}
+
+bool Enemy::getFlying()
+{
+	return this->flying;
+}
+
 void Enemy::die()
 {
 	this->currentTile->occupyDec();
@@ -345,6 +362,16 @@ void Enemy::die()
 
 	this->healthBar.setSize(sf::Vector2f(0, 0));
 	this->healthBarRed.setSize(sf::Vector2f(0, 0));
+}
+
+bool Enemy::getImmune()
+{
+	return this->immune;
+}
+
+float Enemy::getSpeedBase()
+{
+	return this->moveSpeedBase;
 }
 
 void Enemy::updateHealthBar()

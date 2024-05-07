@@ -33,6 +33,8 @@ private:
 	sf::Texture pauseButtonTexture;
 	sf::Sprite resumeButtonSprite;
 	sf::Texture resumeButtonTexture;
+	sf::Sprite startButtonSprite;
+	sf::Texture startButtonTexture;
 
 	sf::Sprite resetButtonSprite;
 	sf::Texture resetButtonTexture;
@@ -69,6 +71,9 @@ private:
 	sf::RectangleShape* UIPauseBox;
 	sf::Text* textPause;
 
+	//GameOver screen
+	sf::Text* textGameOver;
+
 	sf::RectangleShape scrollBlockBox;
 
 	std::vector<Enemy*> enemies;
@@ -78,8 +83,11 @@ private:
 	unsigned level;
 	unsigned lives;
 	unsigned gold;
-	unsigned score;
+	unsigned score=0;
+	unsigned scoreSkip=0;
 
+	bool gameOver = false;
+	bool started = false;
 	bool paused;
 	bool placeMode;
 	TowerType placingTower;
@@ -92,10 +100,17 @@ private:
 	void initVariables();
 	void initGrid();
 
+	float timeScale = 1.0;
+	void setTimeScale(float scale);
+
 	bool mouseOnSprite(sf::Sprite sprite);
 	bool mouseOnShape(sf::RectangleShape shape);
 
 	void reset();
+	void start();
+	void endGame();
+
+	void sellTower();
 
 	sf::Clock clock;
 

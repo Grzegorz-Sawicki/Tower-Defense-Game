@@ -135,12 +135,37 @@ Tower::Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType t
 	this->initRadiusCircle();
 
 	this->sellPrice = this->cost * 0.75;
-;	this->shootInterval = sf::seconds(1.f / shootSpeed);
+	this->shootInterval = sf::seconds(1.f / shootSpeed);
 	this->shootTimer = this->shootInterval;
 	this->targetEnemy = nullptr;
 	this->targetEnemyDead = false;
 	this->enemyDetected = false;
 }
+
+Tower::Tower(const std::vector<Enemy*>& enemies, std::vector<Tile*> tiles, TowerType type) : enemies(enemies), type(type)
+{
+	this->tiles = tiles;
+
+	Tile baseTile = *this->tiles[0];
+	this->posX = baseTile.getPosition().x + baseTile.getOrigin().x;
+	this->posY = baseTile.getPosition().y + baseTile.getOrigin().y;
+
+	for (auto* tile : this->tiles) {
+		tile->setType(TileType::TOWER);
+	}
+
+	this->handleJsonData();
+	this->initText();
+	this->initRadiusCircle();
+
+	this->sellPrice = this->cost * 0.75;
+	this->shootInterval = sf::seconds(1.f / shootSpeed);
+	this->shootTimer = this->shootInterval;
+	this->targetEnemy = nullptr;
+	this->targetEnemyDead = false;
+	this->enemyDetected = false;
+}
+
 
 Tower::~Tower()
 {
@@ -243,10 +268,45 @@ void Tower::upgrade(unsigned int& gold)
 	this->radiusCircle.setRadius(this->range);
 	this->radiusCircle.setOrigin(this->range, this->range);
 	this->speedStr = upgrade.speedStr;
-	if(!upgrade.shootSpeed) this->shootSpeed = upgrade.shootSpeed;
-	if(!upgrade.stunChance) this->stunChance = upgrade.stunChance;
-	if(!upgrade.slowValue) this->slowValue = upgrade.slowValue;
-	if(!upgrade.aoeRange) this->aoeRange = upgrade.aoeRange;
+	if (upgrade.shootSpeed != 0) {
+		this->shootSpeed = upgrade.shootSpeed;
+	}
+	if (upgrade.stunChance != 0) {
+		this->stunChance = upgrade.stunChance;
+		for (json& effect : this->effects) {
+			if (effect["name"] == "stun") {
+				effect["chance"] = this->stunChance;
+			}
+		}
+	}
+	if (upgrade.slowValue != 0) {
+		this->slowValue = upgrade.slowValue;
+		for (json& effect : this->effects) {
+			if (effect["name"] == "slow") {
+				effect["value"] = this->slowValue;
+			}
+		}
+	}
+	if (upgrade.aoeRange != 0) {
+		this->aoeRange = upgrade.aoeRange;
+		//Tower wasn't originally AOE, but is due to an upgrade:
+		if (this->isAoe == false) {
+			this->isAoe = true;
+			json newObject;
+			newObject["name"] = "aoe";
+			newObject["range"] = this->aoeRange;
+			this->effects.push_back(newObject);
+		}
+		else {
+			for (json& effect : this->effects) {
+				if (effect["name"] == "aoe") {
+					effect["range"] = this->aoeRange;
+				}
+			}
+		}
+	}
+
+	this->sellPrice = this->cost * 0.75;
 
 	gold -= upgrade.cost;
 }
@@ -264,6 +324,13 @@ bool Tower::hasNextUpgrade()
 {
 	if (this->level < this->towerUpgrades.size() + 1) return true;
 	return false;
+}
+
+void Tower::sell()
+{
+	for (auto* tile : this->tiles) {
+		tile->setType(TileType::DEFAULT);
+	}
 }
 
 void Tower::update()
@@ -304,7 +371,7 @@ void Tower::update()
 	}
 	else {
 		sf::Time remainingTime = this->upgradeTime - this->upgradeClock.getElapsedTime();
-		int remainingTimeInt = static_cast<int>(remainingTime.asSeconds()+1);
+		int remainingTimeInt = static_cast<int>(remainingTime.asSeconds() + 1);
 		this->upgradeText.setString(std::to_string(remainingTimeInt));
 		if (this->upgradeClock.getElapsedTime() >= this->upgradeTime) {
 			this->upgrading = false;
@@ -314,7 +381,8 @@ void Tower::update()
 	this->updateProjectiles();
 
 	//Increment shoot timer
-	this->shootTimer += this->clock.restart();
+	this->shootTimer += this->clock.getElapsedTime();
+	this->clock.restart();
 }
 
 void Tower::updateProjectiles()
@@ -338,7 +406,7 @@ void Tower::render(sf::RenderTarget* target)
 	if (this->upgrading) target->draw(this->upgradeText);
 	else target->draw(this->spriteBarrel);
 
-	if(this->showRadiusCircle) target->draw(this->radiusCircle);
+	if (this->showRadiusCircle) target->draw(this->radiusCircle);
 }
 
 void Tower::renderProjectiles(sf::RenderTarget* target)

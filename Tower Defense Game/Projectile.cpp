@@ -122,7 +122,7 @@ void Projectile::update()
 	if (this->isAoe) this->aoe->move(velocity);
 
 	//temp
-	if (length <= 1)
+	if (length <= 1.5)
 	{
 		this->destroyed = true;
 		this->targetEnemy->takeDamage(this->damage);

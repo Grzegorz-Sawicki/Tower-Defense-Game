@@ -30,6 +30,7 @@ void Game::initUI()
 
 	this->buttons.emplace_back(&pauseButtonSprite);
 	this->buttons.emplace_back(&resumeButtonSprite);
+	this->buttons.emplace_back(&startButtonSprite);
 	this->buttons.emplace_back(&resetButtonSprite);
 	this->buttons.emplace_back(&levelButtonSprite);
 	this->buttons.emplace_back(&gridButtonSprite);
@@ -42,6 +43,10 @@ void Game::initUI()
 	this->resumeButtonTexture = TextureManager::instance().getTexture("Textures/button_resume.png");
 	this->resumeButtonSprite.setTexture(this->resumeButtonTexture);
 	this->resumeButtonSprite.setPosition(Properties::buttonPausePosition);
+
+	this->startButtonTexture = TextureManager::instance().getTexture("Textures/button_start.png");
+	this->startButtonSprite.setTexture(this->startButtonTexture);
+	this->startButtonSprite.setPosition(Properties::buttonPausePosition);
 
 	this->resetButtonTexture = TextureManager::instance().getTexture("Textures/button_reset.png");
 	this->resetButtonSprite.setTexture(this->resetButtonTexture);
@@ -126,6 +131,10 @@ void Game::initUI()
 	this->textPause->setFillColor(sf::Color(255, 127, 39));
 	this->textPause->setPosition(Properties::textPausePosition);
 
+	this->textGameOver = new sf::Text("GAME OVER", this->font, 50);
+	this->textGameOver->setFillColor(sf::Color::Red);
+	this->textGameOver->setPosition(Properties::textPausePosition);
+
 	this->scrollBlockBox.setFillColor(Properties::darkGray);
 	this->scrollBlockBox.setPosition(Properties::windowWidth - Properties::UIButtonBoxWidth, Properties::windowHeight - Properties::UILevelBoxHeight);
 	this->scrollBlockBox.setSize(sf::Vector2f(
@@ -137,10 +146,13 @@ void Game::initUI()
 
 void Game::initVariables()
 {
+	this->gameOver = false;
+	this->started = false;
 	this->paused = false;
 	this->lives = 20;
 	this->gold = 80;
 	this->score = 0;
+	this->scoreSkip = 0;
 }
 
 void Game::initGrid()
@@ -184,6 +196,36 @@ void Game::reset()
 
 }
 
+void Game::start()
+{
+	this->started = true;
+	this->levelManager->setSpawn(true);
+}
+
+void Game::setTimeScale(float scale)
+{
+	this->timeScale = scale;
+	this->timeScale = this->timeScale;
+	PausableClock::globalTimeScale = this->timeScale;
+	this->window->setFramerateLimit(60 * this->timeScale);
+}
+
+void Game::sellTower()
+{
+	int sellValue = this->selectedTower->getSellPrice();
+	this->selectedTower->sell();
+	towers.erase(std::remove(towers.begin(), towers.end(), this->selectedTower), towers.end());
+	delete this->selectedTower;
+	this->gold += sellValue;
+	Grid::resetPaths();
+	Grid::createPaths();
+}
+
+void Game::endGame()
+{
+
+}
+
 //Constructors and Destructors
 
 Game::Game()
@@ -194,6 +236,7 @@ Game::Game()
 	this->initFonts();
 	this->initUI();
 	this->initGrid();
+	this->setTimeScale(1.0);
 	this->levelManager = new LevelManager(this->enemies);
 
 	this->placeMode = false;
@@ -280,13 +323,18 @@ void Game::updatePollEvents()
 						}
 					}
 
+					//TOWER SELLING
+					if (this->showInfoTowerSell) {
+						if (mouseOnShape(this->infoWindowTower->getSellButtonShape())) {
+							this->sellTower();
+						}
+					}
+
 					//TOWER UPGRADING
 					if (this->showInfoUpgrade) {
 						if (mouseOnShape(this->infoWindowUpgrade->getUpgradeButtonShape())) {
 							if (this->selectedTower->canUpgrade(this->gold)) {
-								this->selectedTower->upgrade(this->gold);
-								
-								std::cout << "UPGRADING" << std::endl;
+								this->selectedTower->upgrade(this->gold);	
 							}
 						}
 					}
@@ -362,31 +410,40 @@ void Game::updatePollEvents()
 						}
 					}
 
-
-
 					//ENEMY SELECT
-					for (auto* enemy : this->enemies)
-					{
-						if (mouseOnSprite(enemy->getSprite())) {
-							delete this->infoWindowEnemy;
-							this->infoWindowEnemy = new InfoWindowEnemy(*enemy);
-							this->showInfoWindow = true;
-							this->showInfoEnemy = true;
-							break;
+					if (this->enemies.size() == 0) this->showInfoEnemy = false;
+					else {
+						for (auto* enemy : this->enemies)
+						{
+							if (mouseOnSprite(enemy->getSprite())) {
+								delete this->infoWindowEnemy;
+								this->infoWindowEnemy = new InfoWindowEnemy(*enemy);
+								this->showInfoWindow = true;
+								this->showInfoEnemy = true;
+								break;
+							}
+							this->showInfoEnemy = false;
 						}
-						this->showInfoEnemy = false;
 					}
 
 					//BUTTONS 
+					if (!this->started && mouseOnSprite(startButtonSprite)) {
+						this->start();
+						break;
+					}
 					if (mouseOnSprite(pauseButtonSprite)) {
 						this->paused = true;
 						this->levelManager->pause();
+						break;
 					}
 					if (mouseOnSprite(levelButtonSprite) && this->levelManager->canSpawnEnemies()) {
+						this->scoreSkip += this->timer*2;
 						this->levelManager->nextLevel();
+						break;
 					}
 					if (mouseOnSprite(resetButtonSprite)) {
 						this->reset();
+						break;
 					}
 				}
 				break;
@@ -402,9 +459,10 @@ void Game::updatePollEvents()
 					Grid::handleMouseMove(sf::Vector2f(e.mouseMove.x, e.mouseMove.y));
 				}
 				if (e.key.code == sf::Keyboard::Space) {
-					this->levelManager->setSpawn(true);
+					this->start();
 				}
 				if (e.key.code == sf::Keyboard::S && this->levelManager->canSpawnEnemies()) {
+					this->scoreSkip += this->timer * 2;
 					this->levelManager->nextLevel();
 				}
 				if (e.key.code == sf::Keyboard::P) {
@@ -439,15 +497,22 @@ void Game::updatePollEvents()
 				if (e.key.code == sf::Keyboard::G) {
 					this->gold += 10;
 				}
+				if (e.key.code == sf::Keyboard::Equal) {
+					this->setTimeScale(this->timeScale + 1.0);
+				}
+				else if (e.key.code == sf::Keyboard::Hyphen) {
+					if(this->timeScale >= 2.0)
+						this->setTimeScale(this->timeScale - 1.0);
+				}
 
 			default:
 				break;
 			}
 		}
-		else {
+		else if (!this->gameOver) {
 			switch (e.type) {
 			case sf::Event::MouseButtonPressed:
-				if (this->resumeButtonSprite.getGlobalBounds().contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(*this->window)))) {
+				if (mouseOnSprite(resumeButtonSprite)) {
 					this->paused = false;
 					this->levelManager->resume();
 				}
@@ -460,6 +525,24 @@ void Game::updatePollEvents()
 					this->paused = false;
 					this->levelManager->resume();
 				}
+				break;
+			default:
+				break;
+			}
+		}
+		else {
+			switch (e.type) {
+			case sf::Event::MouseButtonPressed:
+				if (e.mouseButton.button == sf::Mouse::Left) {
+					if (mouseOnSprite(resetButtonSprite)) {
+						this->reset();
+						break;
+					}
+				}
+				break;
+			case sf::Event::Closed:
+				this->window->close();
+				break;
 			default:
 				break;
 			}
@@ -486,8 +569,8 @@ void Game::update()
 		{
 			enemy->update();
 			if (enemy->isDead()) {
-				this->score++;
-				this->gold++;
+				this->score += enemy->getGold();
+				this->gold += enemy->getGold();
 
 				if (enemy->getType() == EnemyType::SPAWN) {
 					deadSpawns.emplace_back(enemy);
@@ -502,6 +585,12 @@ void Game::update()
 			}
 			if (enemy->getPosition().x > Properties::enemyBarrierX || enemy->getPosition().y > Properties::enemyBarrierY) {
 				this->lives--;
+				if (this->lives <= 0) {
+					this->gameOver = true;
+					this->paused = true;
+					break;
+				}
+				enemy->getCurrentTile()->occupyDec();
 				enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
 				//delete enemy;
 			}
@@ -516,7 +605,7 @@ void Game::update()
 		}
 
 		this->textGold->setString(Properties::textGold + std::to_string(this->gold));
-		this->textScore->setString(Properties::textScore + std::to_string(this->score));
+		this->textScore->setString(Properties::textScore + std::to_string(this->score) + "+" + std::to_string(this->scoreSkip));
 		this->textLives->setString(Properties::textLives + std::to_string(this->lives));
 
 		for (auto* tower : this->towers)
@@ -561,9 +650,16 @@ void Game::render()
 	//PAUSE/RESUME BUTTONS
 	if (this->paused) {
 		this->window->draw(*this->UIPauseBox);
-		this->window->draw(*this->textPause);
-		this->window->draw(this->resumeButtonSprite);
+		if (this->gameOver) {
+			this->window->draw(*this->textGameOver);
+		}
+		else {
+			this->window->draw(*this->textPause);
+			this->window->draw(this->resumeButtonSprite);
+		}
+
 	}
+	else if (!this->started) this->window->draw(this->startButtonSprite);
 	else this->window->draw(this->pauseButtonSprite);
 
 	//LEVEL SCROLL BOX

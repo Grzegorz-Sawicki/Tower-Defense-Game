@@ -7,6 +7,8 @@
 #include "FontManager.hpp"
 #include "utils.hpp"
 #include "AoE.h"
+#include "Tile.h"
+#include "PausableClock.h"
 
 class TowerUpgrade 
 {
@@ -34,6 +36,7 @@ class Tower
 {
 private:
 	const std::vector<Enemy*>& enemies;
+	std::vector<Tile*> tiles;
 
 	void handleJsonData();
 	json effects;
@@ -81,7 +84,7 @@ private:
 
 	sf::Time shootInterval;
 	sf::Time shootTimer;
-	sf::Clock clock;
+	PausableClock clock;
 
 	sf::Font font;
 	bool upgrading = false;
@@ -98,6 +101,7 @@ private:
 
 public:
 	Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType type);
+	Tower(const std::vector<Enemy*>& enemies, std::vector<Tile*> tiles, TowerType type);
 	virtual ~Tower();
 
 	sf::FloatRect getBounds();
@@ -124,6 +128,8 @@ public:
 	void upgrade(unsigned int& gold);
 	bool canUpgrade(unsigned int& gold);
 	bool hasNextUpgrade();
+
+	void sell();
 
 	void update();
 	void updateProjectiles();

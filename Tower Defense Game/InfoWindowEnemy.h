@@ -3,33 +3,49 @@
 #include "InfoWindow.h"
 #include "Enemy.h"
 
-class InfoWindowEnemy: public InfoWindow
+class InfoWindowEnemy : public InfoWindow
 {
 private:
 	Enemy* enemy;
 
-	std::string name;
-	std::string flying = "Flying:";
-	std::string immune = "Immune:";
-	std::string health = "Health:";
-	std::string speed = "Speed:";
+	sf::Font font;
 
-	std::string flyingVal;
-	std::string immuneVal;
-	std::string healthVal;
-	std::string speedVal;
+	std::string level;
+	std::string flying;
+	std::string immune;
+	std::string health;
+	std::string speed;
+
+	std::string nameStr = "Creep Level ";
+	std::string flyingStr = "Flying:";
+	std::string immuneStr = "Immune:";
+	std::string healthStr = "Health:";
+	std::string speedStr = "Speed:";
 
 	sf::Text nameText;
 	sf::Text flyingText;
-	sf::Text immuneText;
 	sf::Text healthText;
+	sf::Text immuneText;
 	sf::Text speedText;
+	sf::Text flyingValText;
+	sf::Text healthValText;
+	sf::Text immuneValText;
+	sf::Text speedValText;
 
+	sf::RectangleShape sellButton;
+	sf::Text sellButtonText;
+	std::string sellbuttonString;
+
+	sf::RectangleShape upgradeButton;
+	sf::Text upgradeButtonText;
+	std::string upgradeButtonString;
+
+	void getEnemyInfo();
 	void setupTexts();
+
 public:
 	InfoWindowEnemy(Enemy& enemy);
-	InfoWindowEnemy();
 
-	void update();
+	void render(sf::RenderTarget* target);
 };
 

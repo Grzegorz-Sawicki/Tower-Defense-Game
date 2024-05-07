@@ -25,7 +25,7 @@ using json = nlohmann::json;
 #include <cstdlib>
 
 #include "Properties.h"
-#include "PausableClock.hpp"
+#include "PausableClock.h"
 
 enum class Arrow {
     DEFAULT, UP, RIGHT, DOWN, LEFT, UPRIGHT, UPLEFT, DOWNRIGHT, DOWNLEFT

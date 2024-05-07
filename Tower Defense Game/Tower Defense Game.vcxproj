@@ -146,7 +146,7 @@
     <ClCompile Include="LevelScroll.cpp" />
     <ClCompile Include="LevelScrollBox.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PausableClock.hpp" />
+    <ClCompile Include="PausableClock.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Properties.cpp" />
     <ClCompile Include="TextureManager.cpp" />
@@ -167,6 +167,7 @@
     <ClInclude Include="LevelManager.h" />
     <ClInclude Include="LevelScroll.h" />
     <ClInclude Include="LevelScrollBox.h" />
+    <ClInclude Include="PausableClock.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="TextureManager.hpp" />

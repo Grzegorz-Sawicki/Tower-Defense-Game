@@ -29,6 +29,7 @@ public:
     int getRow();
     int getCol();
     sf::FloatRect getBounds() const;
+    sf::Vector2f getOrigin() const;
     sf::Vector2f getPosition() const;
     bool isOccupied();
     int getOccupyNumber();

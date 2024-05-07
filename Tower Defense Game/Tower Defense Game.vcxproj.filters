@@ -57,16 +57,10 @@
     <ClCompile Include="Properties.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="PausableClock.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClCompile>
     <ClCompile Include="AoE.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="InfoWindow.cpp">
-      <Filter>Pliki źródłowe\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="InfoWindowEnemy.cpp">
       <Filter>Pliki źródłowe\UI</Filter>
     </ClCompile>
     <ClCompile Include="LevelScroll.cpp">
@@ -83,6 +77,12 @@
     </ClCompile>
     <ClCompile Include="InfoWindowTower.cpp">
       <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoWindowEnemy.cpp">
+      <Filter>Pliki źródłowe\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PausableClock.cpp">
+      <Filter>Pliki źródłowe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +125,6 @@
     <ClInclude Include="InfoWindow.h">
       <Filter>Pliki nagłówkowe\UI</Filter>
     </ClInclude>
-    <ClInclude Include="InfoWindowEnemy.h">
-      <Filter>Pliki nagłówkowe\UI</Filter>
-    </ClInclude>
     <ClInclude Include="LevelScroll.h">
       <Filter>Pliki nagłówkowe\UI</Filter>
     </ClInclude>
@@ -142,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="InfoWindowTower.h">
       <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoWindowEnemy.h">
+      <Filter>Pliki nagłówkowe\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="PausableClock.h">
+      <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

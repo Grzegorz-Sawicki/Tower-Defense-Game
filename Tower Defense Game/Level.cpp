@@ -6,12 +6,12 @@ void Level::spawnEnemy()
 
 	Path path = Path::HORIZONTAL;
 
-	Enemy* tmp = new Enemy(Grid::getEntranceTiles(), Path::HORIZONTAL, this->type, this->health, this->boss);
+	Enemy* tmp = new Enemy(Grid::getEntranceTiles(), Path::HORIZONTAL, this->type, this->health, this->boss, this->gold, this->number);
 	this->enemies->emplace_back(tmp);
 }
 
-Level::Level(std::vector<Enemy*>& enemies, int number, unsigned count, unsigned health, EnemyType type, bool boss) : 
-	number(number), count(count), health(health), type(type), boss(boss)
+Level::Level(std::vector<Enemy*>& enemies, int gold, int number, unsigned count, unsigned health, EnemyType type, bool boss) : 
+	gold(gold), number(number), count(count), health(health), type(type), boss(boss)
 {
 	this->active = false;
 	this->enemies = &enemies;

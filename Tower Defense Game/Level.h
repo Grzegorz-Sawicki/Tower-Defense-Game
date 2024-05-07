@@ -11,6 +11,7 @@ private:
 	PausableClock spawnClock;
 	sf::Time enemySpawnTimer;
 
+	int gold;
 	unsigned count;
 	unsigned health;
 	EnemyType type;
@@ -23,7 +24,7 @@ private:
 	void spawnEnemy();
 
 public:
-	Level(std::vector<Enemy*>& enemies, int number, unsigned count, unsigned health, EnemyType type, bool boss);
+	Level(std::vector<Enemy*>& enemies, int gold, int number, unsigned count, unsigned health, EnemyType type, bool boss);
 
 	unsigned getEnemyCount();
 	EnemyType getEnemyType();

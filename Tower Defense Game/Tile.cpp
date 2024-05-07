@@ -52,6 +52,11 @@ sf::Vector2f Tile::getPosition() const
     return this->shape.getPosition();
 }
 
+sf::Vector2f Tile::getOrigin() const
+{
+    return this->shape.getOrigin();
+}
+
 bool Tile::isOccupied()
 {
     return this->occupied;
@@ -128,5 +133,6 @@ void Tile::occupyInc()
 
 void Tile::occupyDec()
 {
-    this->occupyNumber--;
+    //ENTRANCE DOESN"T SEEM TO WORK
+    if (this->occupyNumber > 0) this->occupyNumber--;
 }

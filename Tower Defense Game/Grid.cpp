@@ -552,13 +552,16 @@ Tower* Grid::placeTower(const sf::Vector2i& mousePos, TowerType type)
 	int posX = m_tiles[row][col].getBounds().left + m_tiles[row][col].getBounds().width;
 	int posY = m_tiles[row][col].getBounds().top + m_tiles[row][col].getBounds().height;
 
+	std::vector<Tile*> towerTiles;
+
 	if (row >= 0 && row < m_rows - 1 && col >= 0 && col < m_cols - 1) {
 		for (int i = row; i <= row + 1; ++i) {
 			for (int j = col; j <= col + 1; ++j) {
-				m_tiles[i][j].setType(TileType::TOWER);
+				towerTiles.emplace_back(&m_tiles[i][j]);
+				//m_tiles[i][j].setType(TileType::TOWER);
 			}
 		}
 	}
 
-	return new Tower(enemies, posX, posY, type);
+	return new Tower(enemies, towerTiles, type);
 }
