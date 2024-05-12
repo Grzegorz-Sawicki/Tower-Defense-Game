@@ -4,7 +4,7 @@
 int main() {
     srand(time(NULL));
 
-    Game game = Game();
+    Game game = Game(53000);
 
     game.run();
 

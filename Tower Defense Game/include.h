@@ -8,13 +8,16 @@
 #include <queue>
 #include <fstream>
 #include <iomanip>
+#include <thread>
 #include <mutex>
+#include <atomic>
 #include <sstream>
 
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
 #include "SFML/Audio.hpp"
 #include "SFML/Graphics.hpp"
+#include "SFML/Network.hpp"
 
 #include "json.hpp"
 

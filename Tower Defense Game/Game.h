@@ -113,12 +113,18 @@ private:
 	void sellTower();
 
 	sf::Clock clock;
-
+	unsigned short port;
+	sf::TcpListener* listener;
+	std::atomic<bool>* isRunning;
+	void handleClient(sf::TcpSocket& client);
+	std::string helloWorld();
 
 public:
 	//Constructors and Destructors
-	Game();
+	Game(unsigned short port);
 	virtual ~Game();
+
+	void gameLoop();
 
 	//Functions
 	void run();

@@ -228,23 +228,14 @@ void Game::endGame()
 
 //Constructors and Destructors
 
-Game::Game()
+Game::Game(unsigned short port) : port(port), listener(new sf::TcpListener), isRunning(new std::atomic<bool>(true))
 {
-	this->initWindow();
-	this->initSprites();
-	this->initVariables();
-	this->initFonts();
-	this->initUI();
-	this->initGrid();
-	this->setTimeScale(1.0);
-	this->levelManager = new LevelManager(this->enemies);
 
-	this->placeMode = false;
-	this->paused = false;
 }
 
 Game::~Game()
 {
+	delete listener; // Clean up TcpListener
 	delete this->window;
 
 	for (auto* enemy : this->enemies)
@@ -274,13 +265,76 @@ Game::~Game()
 
 //Functions
 
-void Game::run()
-{
-	while (this->window->isOpen())
-	{
+void Game::gameLoop() {
+	this->initWindow();
+	this->initSprites();
+	this->initVariables();
+	this->initFonts();
+	this->initUI();
+	this->initGrid();
+	this->setTimeScale(1.0);
+	this->levelManager = new LevelManager(this->enemies);
+
+	this->placeMode = false;
+	this->paused = false;
+
+	while (window->isOpen()) {
 		this->update();
 		this->render();
 	}
+}
+
+void Game::run()
+{
+	// Start the game loop in a separate thread
+	std::thread gameLoopThread(&Game::gameLoop, this);
+
+	if (listener->listen(port) != sf::Socket::Done) {
+		std::cerr << "Failed to bind to port " << port << std::endl;
+		return;
+	}
+
+	std::cout << "Server is listening on port " << port << std::endl;
+
+	while (*isRunning) {
+		sf::TcpSocket client;
+		if (listener->accept(client) == sf::Socket::Done) {
+			std::cout << "New connection from " << client.getRemoteAddress() << std::endl;
+			handleClient(client);
+		}
+	}
+
+	// Wait for the game loop thread to finish
+	gameLoopThread.join();
+}
+
+void Game::handleClient(sf::TcpSocket& client) {
+	sf::Packet packet;
+	if (client.receive(packet) == sf::Socket::Done) {
+		std::string command;
+		packet >> command;
+		std::cout << "Received command: " << command << std::endl;
+
+		if (command == "hello") {
+			std::string response = helloWorld();
+			sf::Packet responsePacket;
+			responsePacket << response;
+			client.send(responsePacket);
+		}
+		else if (command == "skip") {
+			this->levelManager->nextLevel();
+			this->scoreSkip += this->timer * 2;
+			std::string response = "skipped";
+			sf::Packet responsePacket;
+			responsePacket << response;
+			client.send(responsePacket);
+		}
+		// Add more commands and corresponding functions here
+	}
+}
+
+std::string Game::helloWorld() {
+	return "hello world";
 }
 
 std::vector<Enemy*>& Game::getEnemies()
