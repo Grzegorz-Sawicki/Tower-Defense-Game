@@ -70,7 +70,7 @@ void Game::initUI()
 		Tower* dummyTower = new Tower(enemies, 0, 0, type);
 
 		sf::Sprite* tmpTower = &dummyTower->getSpriteBarrel();
-		tmpTower->setOrigin(sf::Vector2f(0,0));
+		tmpTower->setOrigin(sf::Vector2f(0, 0));
 		sf::Sprite* tmpBase = &dummyTower->getSpriteBase();
 		tmpBase->setOrigin(sf::Vector2f(0, 0));
 
@@ -138,8 +138,8 @@ void Game::initUI()
 	this->scrollBlockBox.setFillColor(Properties::darkGray);
 	this->scrollBlockBox.setPosition(Properties::windowWidth - Properties::UIButtonBoxWidth, Properties::windowHeight - Properties::UILevelBoxHeight);
 	this->scrollBlockBox.setSize(sf::Vector2f(
-			Properties::windowWidth - this->scrollBlockBox.getPosition().x, 
-			Properties::windowHeight - this->scrollBlockBox.getPosition().y)
+		Properties::windowWidth - this->scrollBlockBox.getPosition().x,
+		Properties::windowHeight - this->scrollBlockBox.getPosition().y)
 	);
 
 };
@@ -309,8 +309,13 @@ void Game::run()
 }
 
 void Game::handleClient(sf::TcpSocket& client) {
-	sf::Packet packet;
-	if (client.receive(packet) == sf::Socket::Done) {
+	while (true) {
+		sf::Packet packet;
+		if (client.receive(packet) != sf::Socket::Done) {
+			std::cerr << "Error receiving message from client" << std::endl;
+			break;
+		}
+
 		std::string command;
 		packet >> command;
 		std::cout << "Received command: " << command << std::endl;
@@ -329,12 +334,61 @@ void Game::handleClient(sf::TcpSocket& client) {
 			responsePacket << response;
 			client.send(responsePacket);
 		}
+		else if (command.find("placeTower") != std::string::npos) {
+			int col = 0;
+			int row = 0;
+			TowerType type;
+
+			this->parsePlaceTowerMessage(command, col, row, type);
+
+			this->remotePlaceTower(col, row, type);
+			std::string response = "placed";
+			sf::Packet responsePacket;
+			responsePacket << response;
+			client.send(responsePacket);
+		}
+		else if (command == "getAvailableTiles") {
+			std::string response = Grid::getAvailableTilesString();
+			sf::Packet responsePacket;
+			responsePacket << response;
+			client.send(responsePacket);
+		}
 		// Add more commands and corresponding functions here
+
 	}
 }
 
 std::string Game::helloWorld() {
 	return "hello world";
+}
+
+//WARNING: NO GOLD LOSS
+void Game::remotePlaceTower(int col, int row, TowerType type)
+{
+	if (Grid::canPlaceTower(col, row)) {
+		unsigned int cost = this->dummyTowers[type]->getCost();
+		this->gold -= cost;
+		Tower* t = Grid::getInstance(this->enemies).placeTower(col, row, type);
+		this->towers.push_back(t);
+		Grid::resetPaths();
+		Grid::createPaths();
+		Grid::visualizePaths();
+	}
+}
+
+void Game::parsePlaceTowerMessage(std::string message, int& col, int& row, TowerType& type) {
+	std::stringstream ss(message);
+	std::string action;
+	std::string typeString;
+	ss >> action;
+
+	if (!(ss >> col >> row)) {
+		std::cerr << "Error reading integers" << std::endl;
+		return;
+	}
+
+	ss >> typeString;
+	type = utils::stringToTowerType(typeString);
 }
 
 std::vector<Enemy*>& Game::getEnemies()
@@ -370,7 +424,7 @@ void Game::updatePollEvents()
 					//TOWER BUTTON SELECTION
 					for (int i = 0; i < static_cast<int>(TowerType::ELEM_COUNT); i++) {
 						TowerType type = static_cast<TowerType>(i);
-						
+
 						if (mouseOnSprite(*towerButtons[type])) {
 							this->placingTower = type;
 							this->placeMode = true;
@@ -388,7 +442,7 @@ void Game::updatePollEvents()
 					if (this->showInfoUpgrade) {
 						if (mouseOnShape(this->infoWindowUpgrade->getUpgradeButtonShape())) {
 							if (this->selectedTower->canUpgrade(this->gold)) {
-								this->selectedTower->upgrade(this->gold);	
+								this->selectedTower->upgrade(this->gold);
 							}
 						}
 					}
@@ -404,7 +458,7 @@ void Game::updatePollEvents()
 								delete this->infoWindowUpgrade;
 								this->infoWindowUpgrade = nullptr;
 							}
-							this->infoWindowTower = new InfoWindowTower(*tower,0);
+							this->infoWindowTower = new InfoWindowTower(*tower, 0);
 							this->showInfoWindow = true;
 							this->showInfoTower = true;
 							tower->setShowRadiusCircle(true);
@@ -456,6 +510,7 @@ void Game::updatePollEvents()
 							this->gold -= cost;
 							Tower* t = Grid::getInstance(this->enemies).placeTower(sf::Mouse::getPosition(*this->window), this->placingTower);
 							this->towers.push_back(t);
+							std::cout << Grid::getAvailableTilesString() << std::endl;
 							this->placeMode = false;
 
 							Grid::resetPaths();
@@ -491,7 +546,7 @@ void Game::updatePollEvents()
 						break;
 					}
 					if (mouseOnSprite(levelButtonSprite) && this->levelManager->canSpawnEnemies()) {
-						this->scoreSkip += this->timer*2;
+						this->scoreSkip += this->timer * 2;
 						this->levelManager->nextLevel();
 						break;
 					}
@@ -555,7 +610,7 @@ void Game::updatePollEvents()
 					this->setTimeScale(this->timeScale + 1.0);
 				}
 				else if (e.key.code == sf::Keyboard::Hyphen) {
-					if(this->timeScale >= 2.0)
+					if (this->timeScale >= 2.0)
 						this->setTimeScale(this->timeScale - 1.0);
 				}
 
@@ -613,7 +668,7 @@ void Game::update()
 
 		this->timer = this->levelManager->getRemainingTime().asSeconds();
 		this->textTime->setString(Properties::textTime + std::to_string(this->timer));
-		
+
 		this->level = this->levelManager->getLevel();
 		this->textLevel->setString(Properties::textLevel + std::to_string(this->level));
 
@@ -652,7 +707,7 @@ void Game::update()
 
 		for (auto* ds : deadSpawns)
 		{
-			Enemy* tmp = new Enemy(*ds, sf::Vector2f(0,2));
+			Enemy* tmp = new Enemy(*ds, sf::Vector2f(0, 2));
 			enemies.emplace_back(tmp);
 			Enemy* tmp2 = new Enemy(*ds, sf::Vector2f(0, -2));
 			enemies.emplace_back(tmp2);
@@ -734,7 +789,7 @@ void Game::render()
 	for (const auto& pair : this->towerBases) {
 		TowerType key = pair.first;
 		sf::Sprite* value = pair.second;
-		
+
 		this->window->draw(*value);
 	}
 

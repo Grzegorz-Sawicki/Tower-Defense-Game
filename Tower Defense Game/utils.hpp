@@ -110,6 +110,15 @@ namespace utils
         }
     }
 
+    inline TowerType stringToTowerType(std::string type) {
+        if (type == "PELLET") return TowerType::PELLET;
+        else if (type == "SQUIRT") return TowerType::SQUIRT;
+        else if (type == "DART") return TowerType::DART;
+        else if (type == "SWARM") return TowerType::SWARM;
+        else if (type == "FROST") return TowerType::FROST;
+        else if (type == "BASH") return TowerType::BASH;
+    }
+
     inline EnemyType stringToEnemyType(std::string type) {
         if (type == "NORMAL") return EnemyType::NORMAL;
         else if (type == "GROUP") return EnemyType::GROUP;

@@ -476,22 +476,18 @@ void Grid::visualizeOccupy() {
 
 bool Grid::canPlaceTower(const sf::Vector2i& mousePos)
 {
-
-	// Calculate the index of the tile that the mouse is currently over
 	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
-
-	// Check if mousePos outside grid
-	if (col >= m_cols - 1)
-		return false;
-
-	// Calculate the index of the tile that the mouse is currently over
 	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
 
-	// Check if mousePos outside grid
+	return Grid::canPlaceTower(col, row);
+}
+
+bool Grid::canPlaceTower(int col, int row) {
+	if (col >= m_cols - 1)
+		return false;
 	if (row >= m_rows - 1)
 		return false;
 
-	// Check if all tiles that the tower is supposed to be placed at are unoccupied
 	if (row >= 0 && row < m_rows - 1 && col >= 0 && col < m_cols - 1) {
 		for (int i = row; i <= row + 1; ++i) {
 			for (int j = col; j <= col + 1; ++j) {
@@ -549,9 +545,10 @@ Tower* Grid::placeTower(const sf::Vector2i& mousePos, TowerType type)
 	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
 	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
 
-	int posX = m_tiles[row][col].getBounds().left + m_tiles[row][col].getBounds().width;
-	int posY = m_tiles[row][col].getBounds().top + m_tiles[row][col].getBounds().height;
+	return Grid::placeTower(col, row, type);
+}
 
+Tower* Grid::placeTower(int col, int row, TowerType type) {
 	std::vector<Tile*> towerTiles;
 
 	if (row >= 0 && row < m_rows - 1 && col >= 0 && col < m_cols - 1) {
@@ -564,4 +561,32 @@ Tower* Grid::placeTower(const sf::Vector2i& mousePos, TowerType type)
 	}
 
 	return new Tower(enemies, towerTiles, type);
+}
+
+//RETURNS AVAILABLE TILES IN ;col row; format
+std::string Grid::getAvailableTilesString() {
+	std::string output = ";";
+	bool available = false;
+
+	for (unsigned int i = 0; i < m_rows; ++i) {
+		for (unsigned int j = 0; j < m_cols; ++j) {
+			available = true;
+
+			// check if 4 tiles are default and have 0 occupynum
+			for (int row = i; row <= i + 1; ++row) {
+				for (int col = j; col <= j + 1; ++col) {
+					if (row >= m_rows || col >= m_cols) {
+						available = false;
+						break;
+					}
+					if (m_tiles[row][col].getType() != TileType::DEFAULT || m_tiles[row][col].getOccupyNumber() != 0) available=false;
+				}
+			}
+			if (available) {
+				output += std::to_string(j) + " " + std::to_string(i) + ";";
+			}
+		}
+	}
+	
+	return output;
 }

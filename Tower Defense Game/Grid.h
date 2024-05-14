@@ -36,6 +36,8 @@ public:
     static std::map<Path, std::vector<Tile*>> getExitTiles();
     static Tile* getNearestTile(sf::Vector2f position);
 
+
+
     static std::map<Arrow, Tile*> setupTileNeighbors(int row, int col);
     static void resetTiles();
     static void resetPath(Path path);
@@ -47,7 +49,11 @@ public:
     static void visualizeOccupy();
 
     static bool canPlaceTower(const sf::Vector2i& mousePos);
+    static bool canPlaceTower(int col, int row);
     Tower* placeTower(const sf::Vector2i& mousePos, TowerType type);
+    Tower* placeTower(int col, int row, TowerType type);
+
+    static std::string getAvailableTilesString();
 };
 
 

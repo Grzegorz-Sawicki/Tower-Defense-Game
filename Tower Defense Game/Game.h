@@ -118,6 +118,9 @@ private:
 	std::atomic<bool>* isRunning;
 	void handleClient(sf::TcpSocket& client);
 	std::string helloWorld();
+	void remotePlaceTower(int col, int row, TowerType type);
+
+	void parsePlaceTowerMessage(std::string message, int& col, int& row, TowerType& type);
 
 public:
 	//Constructors and Destructors
