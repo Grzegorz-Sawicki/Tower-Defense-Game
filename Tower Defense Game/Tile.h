@@ -12,6 +12,7 @@ private:
     std::map<Arrow, Tile*> neighbors;
     std::map<Path, Arrow> pathArrows;
     std::map<Path, int> distanceFromExits;
+    std::map<Path, int> straightDistanceFromExits;
 
     int occupyNumber;
     bool occupied;
@@ -36,6 +37,7 @@ public:
 
     Arrow getArrow(Path path);
     int getDistanceFromExit(Path path);
+    int getStraightDistanceFromExit(Path path);
 
     TileType getType();
     std::map<Arrow, Tile*> getNeighbors() const;
@@ -47,6 +49,7 @@ public:
 
     void setArrow(Arrow directionArrow, Path path);
     void setDistanceFromExit(int distance, Path path);
+    void setStraightDistanceFromExit(int distance, Path path);
 
     void setType(TileType type);
     void setBaseColor(sf::Color color);

@@ -221,6 +221,19 @@ void Game::sellTower()
 	Grid::createPaths();
 }
 
+void Game::printEnemies() {
+	for (const auto& enemy : enemies) {
+		std::cout << ";" << enemy->getDistanceFromExit() << " " << enemy->getLevel() << " " << utils::enemyTypeToString(enemy->getType()) << ";";
+	}
+	std::cout << std::endl;
+}
+
+void Game::sortEnemies() {
+	std::sort(enemies.begin(), enemies.end(), [](Enemy* a, Enemy* b) {
+		return a->getDistanceFromExit() < b->getDistanceFromExit();
+	});
+}
+
 void Game::endGame()
 {
 
@@ -228,14 +241,13 @@ void Game::endGame()
 
 //Constructors and Destructors
 
-Game::Game(unsigned short port) : port(port), listener(new sf::TcpListener), isRunning(new std::atomic<bool>(true))
+Game::Game() : isRunning(new std::atomic<bool>(true))
 {
 
 }
 
 Game::~Game()
 {
-	delete listener; // Clean up TcpListener
 	delete this->window;
 
 	for (auto* enemy : this->enemies)
@@ -286,80 +298,26 @@ void Game::gameLoop() {
 
 void Game::run()
 {
-	// Start the game loop in a separate thread
-	std::thread gameLoopThread(&Game::gameLoop, this);
+	//// Start the game loop in a separate thread
+	//std::thread gameLoopThread(&Game::gameLoop, this);
 
-	if (listener->listen(port) != sf::Socket::Done) {
-		std::cerr << "Failed to bind to port " << port << std::endl;
-		return;
-	}
+	//if (listener->listen(port) != sf::Socket::Done) {
+	//	std::cerr << "Failed to bind to port " << port << std::endl;
+	//	return;
+	//}
 
-	std::cout << "Server is listening on port " << port << std::endl;
+	//std::cout << "Server is listening on port " << port << std::endl;
 
-	while (*isRunning) {
-		sf::TcpSocket client;
-		if (listener->accept(client) == sf::Socket::Done) {
-			std::cout << "New connection from " << client.getRemoteAddress() << std::endl;
-			handleClient(client);
-		}
-	}
+	//while (*isRunning) {
+	//	sf::TcpSocket client;
+	//	if (listener->accept(client) == sf::Socket::Done) {
+	//		std::cout << "New connection from " << client.getRemoteAddress() << std::endl;
+	//		handleClient(client);
+	//	}
+	//}
 
-	// Wait for the game loop thread to finish
-	gameLoopThread.join();
-}
-
-void Game::handleClient(sf::TcpSocket& client) {
-	while (true) {
-		sf::Packet packet;
-		if (client.receive(packet) != sf::Socket::Done) {
-			std::cerr << "Error receiving message from client" << std::endl;
-			break;
-		}
-
-		std::string command;
-		packet >> command;
-		std::cout << "Received command: " << command << std::endl;
-
-		if (command == "hello") {
-			std::string response = helloWorld();
-			sf::Packet responsePacket;
-			responsePacket << response;
-			client.send(responsePacket);
-		}
-		else if (command == "skip") {
-			this->levelManager->nextLevel();
-			this->scoreSkip += this->timer * 2;
-			std::string response = "skipped";
-			sf::Packet responsePacket;
-			responsePacket << response;
-			client.send(responsePacket);
-		}
-		else if (command.find("placeTower") != std::string::npos) {
-			int col = 0;
-			int row = 0;
-			TowerType type;
-
-			this->parsePlaceTowerMessage(command, col, row, type);
-
-			this->remotePlaceTower(col, row, type);
-			std::string response = "placed";
-			sf::Packet responsePacket;
-			responsePacket << response;
-			client.send(responsePacket);
-		}
-		else if (command == "getAvailableTiles") {
-			std::string response = Grid::getAvailableTilesString();
-			sf::Packet responsePacket;
-			responsePacket << response;
-			client.send(responsePacket);
-		}
-		// Add more commands and corresponding functions here
-
-	}
-}
-
-std::string Game::helloWorld() {
-	return "hello world";
+	//// Wait for the game loop thread to finish
+	//gameLoopThread.join();
 }
 
 //WARNING: NO GOLD LOSS
@@ -374,21 +332,6 @@ void Game::remotePlaceTower(int col, int row, TowerType type)
 		Grid::createPaths();
 		Grid::visualizePaths();
 	}
-}
-
-void Game::parsePlaceTowerMessage(std::string message, int& col, int& row, TowerType& type) {
-	std::stringstream ss(message);
-	std::string action;
-	std::string typeString;
-	ss >> action;
-
-	if (!(ss >> col >> row)) {
-		std::cerr << "Error reading integers" << std::endl;
-		return;
-	}
-
-	ss >> typeString;
-	type = utils::stringToTowerType(typeString);
 }
 
 std::vector<Enemy*>& Game::getEnemies()
@@ -510,7 +453,6 @@ void Game::updatePollEvents()
 							this->gold -= cost;
 							Tower* t = Grid::getInstance(this->enemies).placeTower(sf::Mouse::getPosition(*this->window), this->placingTower);
 							this->towers.push_back(t);
-							std::cout << Grid::getAvailableTilesString() << std::endl;
 							this->placeMode = false;
 
 							Grid::resetPaths();
@@ -613,6 +555,9 @@ void Game::updatePollEvents()
 					if (this->timeScale >= 2.0)
 						this->setTimeScale(this->timeScale - 1.0);
 				}
+				if (e.key.code == sf::Keyboard::N) {
+					this->printEnemies();
+				}
 
 			default:
 				break;
@@ -628,6 +573,7 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::Closed:
 				this->window->close();
+				this->isRunning->store(false);
 				break;
 			case sf::Event::KeyPressed:
 				if (e.key.code == sf::Keyboard::P) {
@@ -651,6 +597,7 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::Closed:
 				this->window->close();
+				this->isRunning->store(false);
 				break;
 			default:
 				break;
@@ -665,6 +612,7 @@ void Game::update()
 	this->updatePollEvents();
 	if (!this->paused) {
 		this->levelManager->update();
+		this->sortEnemies();
 
 		this->timer = this->levelManager->getRemainingTime().asSeconds();
 		this->textTime->setString(Properties::textTime + std::to_string(this->timer));

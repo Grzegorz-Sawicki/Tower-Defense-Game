@@ -90,36 +90,37 @@ void Enemy::move(sf::Vector2f offset)
 
 void Enemy::moveCase()
 {
-	if (this->flying) {
-		this->move(this->direction * moveSpeed);
-	}
-	else {
-		Tile* right = this->getCurrentTile()->getNeighbors()[Arrow::RIGHT];
-		Tile* left = this->getCurrentTile()->getNeighbors()[Arrow::LEFT];
-		Tile* up = this->getCurrentTile()->getNeighbors()[Arrow::UP];
-		Tile* down = this->getCurrentTile()->getNeighbors()[Arrow::DOWN];
-		Tile* upright = this->getCurrentTile()->getNeighbors()[Arrow::UPRIGHT];
-		Tile* downright = this->getCurrentTile()->getNeighbors()[Arrow::DOWNRIGHT];
-		Tile* upleft = this->getCurrentTile()->getNeighbors()[Arrow::UPLEFT];
-		Tile* downleft = this->getCurrentTile()->getNeighbors()[Arrow::DOWNLEFT];
+	Tile* right = this->getCurrentTile()->getNeighbors()[Arrow::RIGHT];
+	Tile* left = this->getCurrentTile()->getNeighbors()[Arrow::LEFT];
+	Tile* up = this->getCurrentTile()->getNeighbors()[Arrow::UP];
+	Tile* down = this->getCurrentTile()->getNeighbors()[Arrow::DOWN];
+	Tile* upright = this->getCurrentTile()->getNeighbors()[Arrow::UPRIGHT];
+	Tile* downright = this->getCurrentTile()->getNeighbors()[Arrow::DOWNRIGHT];
+	Tile* upleft = this->getCurrentTile()->getNeighbors()[Arrow::UPLEFT];
+	Tile* downleft = this->getCurrentTile()->getNeighbors()[Arrow::DOWNLEFT];
 
-		Tile* neighborTile = this->getCurrentTile()->getNeighbors()[this->currentArrow];
+	Tile* neighborTile = this->getCurrentTile()->getNeighbors()[this->currentArrow];
 
-		if (neighborTile != nullptr && utils::getDistance(this->getPosition(true), neighborTile->getPosition()) <= 1.f) {
-			this->currentTile->occupyDec();
-			this->currentTile = neighborTile;
+	if (neighborTile != nullptr && utils::getDistance(this->getPosition(true), neighborTile->getPosition()) <= 1.f) {
 
-			Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
+		if (!this->flying) this->currentTile->occupyDec();
+		this->currentTile = neighborTile;
 
-			if (nextObjectiveTile != nullptr)
-				this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
+		Tile* nextObjectiveTile;
+		if (this->flying) nextObjectiveTile = this->currentTile->getNeighbors()[this->currentArrow];
+		else nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
 
+		if (nextObjectiveTile != nullptr && !this->flying)
+			this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
+
+		if (!this->flying) {
 			this->currentArrow = this->currentTile->getArrow(this->path);
 			this->direction = utils::getArrowDirection(this->currentTile->getArrow(this->path));
 		}
-
-		this->move(this->direction * moveSpeed);
 	}
+
+	this->move(this->direction * moveSpeed);
+
 
 }
 
@@ -172,7 +173,9 @@ Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyT
 	this->initHealthBar();
 	this->dead = false;
 	this->direction = this->createSpawnDirection();
-	this->currentArrow = Arrow::DEFAULT;
+	if (this->path == Path::HORIZONTAL) this->currentArrow = Arrow::RIGHT;
+	else if (this->path == Path::VERTICAL) this->currentArrow = Arrow::DOWN;
+	
 	this->reachedEntrance = false;
 	this->maxhp = hp;
 	this->hp = hp;
@@ -354,10 +357,13 @@ bool Enemy::getFlying()
 
 void Enemy::die()
 {
-	this->currentTile->occupyDec();
-	Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
-	if (nextObjectiveTile != nullptr && this->reachedEntrance)
-		nextObjectiveTile->occupyDec();
+	if (!this->flying) {
+		this->currentTile->occupyDec();
+		Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)];
+		if (nextObjectiveTile != nullptr && this->reachedEntrance)
+			nextObjectiveTile->occupyDec();
+	}
+
 	this->dead = true;
 
 	this->healthBar.setSize(sf::Vector2f(0, 0));
@@ -390,6 +396,7 @@ void Enemy::update()
 		if (!this->stunned) {
 			sf::Vector2f dir = this->getDirection();
 			this->sprite.setRotation(utils::getRotation(dir));
+			this->updateDistanceFromExit();
 
 			if (this->slowed) {
 				if (this->slowClock.getElapsedTime() >= this->slowLength) {
@@ -400,7 +407,7 @@ void Enemy::update()
 
 			if (!this->didReachedEntrance()) {
 				this->move(this->direction * moveSpeed);
-				if (utils::getDistance(this->getCurrentTile()->getPosition(),this->getPosition(true)) <= 1.f) {
+				if (utils::getDistance(this->getCurrentTile()->getPosition(), this->getPosition(true)) <= 1.f) {
 					this->reachedEntrance = true;
 					if (!this->flying) {
 						this->currentArrow = this->currentTile->getArrow(this->path);
@@ -410,6 +417,9 @@ void Enemy::update()
 
 						if (nextObjectiveTile != nullptr)
 							this->currentTile->getNeighbors()[this->currentTile->getArrow(this->path)]->occupyInc();
+					}
+					else {
+						Tile* nextObjectiveTile = this->currentTile->getNeighbors()[this->currentArrow];
 					}
 				}
 			}
@@ -450,4 +460,19 @@ void Enemy::setHp(int hp)
 void Enemy::setPosition(sf::Vector2f position)
 {
 	this->sprite.setPosition(position);
+}
+
+int Enemy::getDistanceFromExit()
+{
+	return this->distanceFromExit;
+}
+
+void Enemy::updateDistanceFromExit()
+{
+	if (this->flying) {
+		this->distanceFromExit = this->currentTile->getStraightDistanceFromExit(this->path);
+	}
+	else {
+		this->distanceFromExit = this->currentTile->getDistanceFromExit(this->path);
+	}
 }

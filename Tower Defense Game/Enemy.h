@@ -37,6 +37,7 @@ private:
 	sf::Vector2f direction;
 	Tile* currentTile;
 	bool reachedEntrance;
+	int distanceFromExit;
 
 	bool slowed=false;
 	float slowValue=0.f;
@@ -85,6 +86,7 @@ public:
 	Tile* getCurrentTile();
 	bool didReachedEntrance();
 	sf::Sprite getSprite();
+	int getDistanceFromExit();
 
 	void setSlow(float value, float length);
 	void setStun(float length);
@@ -92,6 +94,7 @@ public:
 	void setPositionOffset(sf::Vector2f offset);
 	void setDirection(sf::Vector2f direction);
 	void setCurrentTile(Tile* tile);
+	void updateDistanceFromExit();
 
 	void setDead(bool dead);
 	void setMaxHp(int maxHp);

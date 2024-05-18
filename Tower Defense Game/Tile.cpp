@@ -12,6 +12,8 @@ Tile::Tile(int row, int col, float x, float y, sf::Color baseColor, TileType typ
     this->pathArrows[Path::VERTICAL] = Arrow::DEFAULT;
     this->distanceFromExits[Path::HORIZONTAL] = -1;
     this->distanceFromExits[Path::VERTICAL] = -1;
+    this->straightDistanceFromExits[Path::HORIZONTAL] = -1;
+    this->straightDistanceFromExits[Path::VERTICAL] = -1;
     this->neighbors = neighbors;
 }
 
@@ -77,6 +79,11 @@ int Tile::getDistanceFromExit(Path path)
     return this->distanceFromExits[path];
 }
 
+int Tile::getStraightDistanceFromExit(Path path)
+{
+    return this->straightDistanceFromExits[path];
+}
+
 TileType Tile::getType()
 {
     return this->type;
@@ -110,6 +117,11 @@ void Tile::setArrow(Arrow directionArrow, Path path)
 void Tile::setDistanceFromExit(int distance, Path path)
 {
     this->distanceFromExits[path] = distance;
+}
+
+void Tile::setStraightDistanceFromExit(int distance, Path path)
+{
+    this->straightDistanceFromExits[path] = distance;
 }
 
 void Tile::setType(TileType type)

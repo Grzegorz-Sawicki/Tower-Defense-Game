@@ -145,6 +145,8 @@ void Grid::resetTiles()
 	for (unsigned int i = 0; i < m_rows; ++i) {
 		for (unsigned int j = 0; j < m_cols; ++j) {
 			m_tiles[i][j].setNeighbors(setupTileNeighbors(i, j));
+			m_tiles[i][j].setStraightDistanceFromExit(m_cols - 1 - j, Path::HORIZONTAL);
+			m_tiles[i][j].setStraightDistanceFromExit(m_rows - 1 - i, Path::VERTICAL);
 		}
 	}
 
@@ -459,7 +461,7 @@ void Grid::visualizePath(Path path) {
 
 void Grid::visualizePaths() {
 	visualizeOccupy();
-	visualizePath(Path::HORIZONTAL);
+	//visualizePath(Path::HORIZONTAL);
 	//visualizePath(Path::VERTICAL);
 }
 

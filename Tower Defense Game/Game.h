@@ -12,6 +12,7 @@
 
 class Game
 {
+	friend class GameServer;
 private:
 	sf::VideoMode videoMode;
 	sf::RenderWindow* window;
@@ -111,20 +112,16 @@ private:
 	void endGame();
 
 	void sellTower();
+	void printEnemies();
+	void sortEnemies();
 
 	sf::Clock clock;
-	unsigned short port;
-	sf::TcpListener* listener;
 	std::atomic<bool>* isRunning;
-	void handleClient(sf::TcpSocket& client);
-	std::string helloWorld();
 	void remotePlaceTower(int col, int row, TowerType type);
-
-	void parsePlaceTowerMessage(std::string message, int& col, int& row, TowerType& type);
 
 public:
 	//Constructors and Destructors
-	Game(unsigned short port);
+	Game();
 	virtual ~Game();
 
 	void gameLoop();
