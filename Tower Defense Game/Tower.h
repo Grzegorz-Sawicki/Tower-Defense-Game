@@ -120,6 +120,7 @@ public:
 	std::string getSpeedStr();
 	int getSellPrice();
 	std::string getDescription();
+	std::vector<Tile*> getTiles();
 
 	void setShowRadiusCircle(bool show);
 

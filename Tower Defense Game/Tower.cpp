@@ -249,6 +249,11 @@ void Tower::setShowRadiusCircle(bool show)
 	this->showRadiusCircle = show;
 }
 
+std::vector<Tile*> Tower::getTiles()
+{
+	return this->tiles;
+}
+
 TowerUpgrade Tower::getNextUpgrade()
 {
 	return this->towerUpgrades[this->level - 1];

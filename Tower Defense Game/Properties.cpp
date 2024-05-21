@@ -30,7 +30,7 @@ float Properties::tileSize = 18.f;
 int Properties::gridTileNumHorizontal = 28;
 int Properties::gridTileNumVertical = 24;
 sf::Time Properties::enemySpawnTimer = sf::seconds(0.7);
-sf::Time Properties::levelTimer = sf::seconds(35);
+sf::Time Properties::levelTimer = sf::seconds(25);
 
 int Properties::enemyBarrierX = 580;
 int Properties::enemyBarrierY = 540;

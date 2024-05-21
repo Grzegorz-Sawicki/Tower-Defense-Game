@@ -541,11 +541,23 @@ bool Grid::canPlaceTower(int col, int row) {
 	return true;
 }
 
+Tile& Grid::getTile(int col, int row) {
+	return m_tiles[row][col];
+}
+
+int Grid::mousePosToCol(const sf::Vector2i& mousePos) {
+	return static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
+}
+
+int Grid::mousePosToRow(const sf::Vector2i& mousePos) {
+	return static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
+}
+
 Tower* Grid::placeTower(const sf::Vector2i& mousePos, TowerType type)
 {
 	// Calculate the index of the tile that the mouse is currently over
-	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
-	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
+	int col = Grid::mousePosToCol(mousePos);
+	int row = Grid::mousePosToRow(mousePos);
 
 	return Grid::placeTower(col, row, type);
 }

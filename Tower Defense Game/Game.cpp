@@ -239,6 +239,37 @@ void Game::endGame()
 
 }
 
+void Game::pause() {
+	this->paused = true;
+	this->levelManager->pause();
+}
+
+void Game::unpause() {
+	this->paused = false;
+	this->levelManager->resume();
+}
+
+void Game::skip() {
+	this->scoreSkip += this->timer * 2;
+	this->levelManager->nextLevel();
+}
+
+bool Game::speedUp() {
+	if (!this->started) {
+		this->setTimeScale(this->timeScale + 1.0);
+		return true;
+	}
+	return false;
+}
+
+bool Game::speedDown() {
+	if (!this->started && this->timeScale >= 2.0) {
+		this->setTimeScale(this->timeScale - 1.0);
+		return true;
+	}
+	return false;
+}
+
 //Constructors and Destructors
 
 Game::Game() : isRunning(new std::atomic<bool>(true))
@@ -296,42 +327,60 @@ void Game::gameLoop() {
 	}
 }
 
-void Game::run()
+bool Game::placeTower(int col, int row, TowerType type)
 {
-	//// Start the game loop in a separate thread
-	//std::thread gameLoopThread(&Game::gameLoop, this);
-
-	//if (listener->listen(port) != sf::Socket::Done) {
-	//	std::cerr << "Failed to bind to port " << port << std::endl;
-	//	return;
-	//}
-
-	//std::cout << "Server is listening on port " << port << std::endl;
-
-	//while (*isRunning) {
-	//	sf::TcpSocket client;
-	//	if (listener->accept(client) == sf::Socket::Done) {
-	//		std::cout << "New connection from " << client.getRemoteAddress() << std::endl;
-	//		handleClient(client);
-	//	}
-	//}
-
-	//// Wait for the game loop thread to finish
-	//gameLoopThread.join();
-}
-
-//WARNING: NO GOLD LOSS
-void Game::remotePlaceTower(int col, int row, TowerType type)
-{
-	if (Grid::canPlaceTower(col, row)) {
-		unsigned int cost = this->dummyTowers[type]->getCost();
+	unsigned int cost = this->dummyTowers[type]->getCost();
+	if (Grid::canPlaceTower(col, row) && cost <= this->gold && !this->paused) {
 		this->gold -= cost;
 		Tower* t = Grid::getInstance(this->enemies).placeTower(col, row, type);
 		this->towers.push_back(t);
 		Grid::resetPaths();
 		Grid::createPaths();
 		Grid::visualizePaths();
+		return true;
 	}
+	return false;
+}
+
+Tower* Game::getTowerByTile(Tile& tile) {
+	for (auto* tower : this->towers)
+	{
+		for (auto* towerTile : tower->getTiles()) {
+			if (towerTile == &tile) return tower;
+		}
+	}
+	return nullptr;
+}
+
+bool Game::sellTower(int col, int row)
+{
+	Tile& tile = Grid::getInstance(this->enemies).getTile(col, row);
+	Tower* tower = this->getTowerByTile(tile);
+
+	if (tower != nullptr && !this->paused) {
+		int sellValue = tower->getSellPrice();
+		tower->sell();
+		towers.erase(std::remove(towers.begin(), towers.end(), tower), towers.end());
+		delete tower;
+		this->gold += sellValue;
+		Grid::resetPaths();
+		Grid::createPaths();
+		return true;
+	}
+	else return false;
+}
+
+bool Game::upgradeTower(int col, int row) {
+	Tile& tile = Grid::getInstance(this->enemies).getTile(col, row);
+	Tower* tower = this->getTowerByTile(tile);
+
+	if (tower != nullptr && !this->paused) {
+		if (tower->canUpgrade(this->gold)) {
+			tower->upgrade(this->gold);
+			return true;
+		}
+	}
+	return false;
 }
 
 std::vector<Enemy*>& Game::getEnemies()
@@ -448,17 +497,10 @@ void Game::updatePollEvents()
 
 					//TOWER PLACING
 					if (this->placeMode) {
-						unsigned int cost = this->dummyTowers[placingTower]->getCost();
-						if (Grid::canPlaceTower(sf::Mouse::getPosition(*this->window)) && this->gold >= cost) {
-							this->gold -= cost;
-							Tower* t = Grid::getInstance(this->enemies).placeTower(sf::Mouse::getPosition(*this->window), this->placingTower);
-							this->towers.push_back(t);
-							this->placeMode = false;
-
-							Grid::resetPaths();
-							Grid::createPaths();
-							Grid::visualizePaths();
-						}
+						const sf::Vector2i& mousePos = sf::Mouse::getPosition(*this->window);
+						int col = Grid::mousePosToCol(mousePos);
+						int row = Grid::mousePosToRow(mousePos);
+						if (this->placeTower(col, row, placingTower)) this->placeMode = false;
 					}
 
 					//ENEMY SELECT
@@ -483,17 +525,15 @@ void Game::updatePollEvents()
 						break;
 					}
 					if (mouseOnSprite(pauseButtonSprite)) {
-						this->paused = true;
-						this->levelManager->pause();
+						this->pause();
 						break;
 					}
 					if (mouseOnSprite(levelButtonSprite) && this->levelManager->canSpawnEnemies()) {
-						this->scoreSkip += this->timer * 2;
-						this->levelManager->nextLevel();
+						this->skip();
 						break;
 					}
 					if (mouseOnSprite(resetButtonSprite)) {
-						this->reset();
+						this->shouldReset = true;
 						break;
 					}
 				}
@@ -513,12 +553,10 @@ void Game::updatePollEvents()
 					this->start();
 				}
 				if (e.key.code == sf::Keyboard::S && this->levelManager->canSpawnEnemies()) {
-					this->scoreSkip += this->timer * 2;
-					this->levelManager->nextLevel();
+					this->skip();
 				}
 				if (e.key.code == sf::Keyboard::P) {
-					this->paused = true;
-					this->levelManager->pause();
+					this->pause();
 					//system("pause");
 				}
 				if (e.key.code == sf::Keyboard::Num1) {
@@ -549,11 +587,10 @@ void Game::updatePollEvents()
 					this->gold += 10;
 				}
 				if (e.key.code == sf::Keyboard::Equal) {
-					this->setTimeScale(this->timeScale + 1.0);
+					this->speedUp();
 				}
 				else if (e.key.code == sf::Keyboard::Hyphen) {
-					if (this->timeScale >= 2.0)
-						this->setTimeScale(this->timeScale - 1.0);
+					this->speedDown();
 				}
 				if (e.key.code == sf::Keyboard::N) {
 					this->printEnemies();
@@ -567,8 +604,7 @@ void Game::updatePollEvents()
 			switch (e.type) {
 			case sf::Event::MouseButtonPressed:
 				if (mouseOnSprite(resumeButtonSprite)) {
-					this->paused = false;
-					this->levelManager->resume();
+					this->unpause();
 				}
 				break;
 			case sf::Event::Closed:
@@ -577,8 +613,7 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::KeyPressed:
 				if (e.key.code == sf::Keyboard::P) {
-					this->paused = false;
-					this->levelManager->resume();
+					this->unpause();
 				}
 				break;
 			default:
@@ -590,7 +625,7 @@ void Game::updatePollEvents()
 			case sf::Event::MouseButtonPressed:
 				if (e.mouseButton.button == sf::Mouse::Left) {
 					if (mouseOnSprite(resetButtonSprite)) {
-						this->reset();
+						this->shouldReset = true;
 						break;
 					}
 				}
@@ -642,6 +677,7 @@ void Game::update()
 			}
 			if (enemy->getPosition().x > Properties::enemyBarrierX || enemy->getPosition().y > Properties::enemyBarrierY) {
 				this->lives--;
+				gameServer->sendMessage("Lives: " + std::to_string(this->lives));
 				if (this->lives <= 0) {
 					this->gameOver = true;
 					this->paused = true;
@@ -669,6 +705,10 @@ void Game::update()
 		{
 			tower->update();
 		}
+	}
+	if (shouldReset) {
+		this->reset();
+		shouldReset = false;
 	}
 }
 
@@ -764,3 +804,5 @@ void Game::render()
 
 	this->window->display();
 }
+
+

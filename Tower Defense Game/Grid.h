@@ -32,6 +32,7 @@ public:
 
     static void handleMouseMove(const sf::Vector2f& mousePos);
 
+    Tile& getTile(int col, int row);
     static std::map<Path, std::vector<Tile*>> getEntranceTiles();
     static std::map<Path, std::vector<Tile*>> getExitTiles();
     static Tile* getNearestTile(sf::Vector2f position);
@@ -50,6 +51,8 @@ public:
 
     static bool canPlaceTower(const sf::Vector2i& mousePos);
     static bool canPlaceTower(int col, int row);
+    static int mousePosToCol(const sf::Vector2i& mousePos);
+    static int mousePosToRow(const sf::Vector2i& mousePos);
     Tower* placeTower(const sf::Vector2i& mousePos, TowerType type);
     Tower* placeTower(int col, int row, TowerType type);
 

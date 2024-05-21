@@ -9,11 +9,14 @@
 #include "LevelManager.h"
 #include "InfoWindowEnemy.h"
 #include "InfoWindowTower.h"
+#include "GameServer.h"
 
 class Game
 {
 	friend class GameServer;
 private:
+	GameServer* gameServer;
+
 	sf::VideoMode videoMode;
 	sf::RenderWindow* window;
 	LevelManager* levelManager;
@@ -107,17 +110,26 @@ private:
 	bool mouseOnSprite(sf::Sprite sprite);
 	bool mouseOnShape(sf::RectangleShape shape);
 
+	bool shouldReset=false;
 	void reset();
 	void start();
 	void endGame();
+	void pause();
+	void unpause();
+	void skip();
+	bool speedUp();
+	bool speedDown();
 
+	Tower* getTowerByTile(Tile& tile);
 	void sellTower();
 	void printEnemies();
 	void sortEnemies();
 
 	sf::Clock clock;
 	std::atomic<bool>* isRunning;
-	void remotePlaceTower(int col, int row, TowerType type);
+	bool placeTower(int col, int row, TowerType type);
+	bool sellTower(int col, int row);
+	bool upgradeTower(int col, int row);
 
 public:
 	//Constructors and Destructors
