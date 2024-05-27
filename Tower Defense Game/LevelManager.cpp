@@ -68,7 +68,7 @@ LevelManager::~LevelManager()
 	delete levelScrollOutline;
 }
 
-void LevelManager::nextLevel()
+bool LevelManager::nextLevel()
 {
 	if (this->currentLevel < this->levels.size()) {
 		this->currentLevel++;
@@ -87,7 +87,9 @@ void LevelManager::nextLevel()
 		}
 
 		this->currentScrollCount = 0;
+		return true;
 	}
+	return false;
 }
 
 void LevelManager::pause()

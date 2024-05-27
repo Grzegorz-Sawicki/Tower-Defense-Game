@@ -24,14 +24,7 @@ void GameServer::handleClient()
 			std::cout << std::endl;
 		}
 
-
-
-
 		std::cout << "Received command: " << command << std::endl;
-
-		//std::string command;
-		//packet >> command;
-		//std::cout << "Received command: " << command << std::endl;
 
 		if (command.find("placeTower") != std::string::npos) {
 			int col = 0;
@@ -40,8 +33,12 @@ void GameServer::handleClient()
 
 			this->parsePlaceTowerMessage(command, col, row, type);
 
-			this->remotePlaceTower(col, row, type);
-			std::string response = "placed";
+			std::string response;
+
+			if (game.placeTower(col, row, type)) {
+				response = "tower placed";
+			}
+			else response = "tower not placed";
 			sendMessage(response);
 		}
 		else if (command.find("sellTower") != std::string::npos) {
@@ -50,8 +47,12 @@ void GameServer::handleClient()
 
 			this->parseSellTowerMessage(command, col, row);
 
-			this->remoteSellTower(col, row);
-			std::string response = "sold";
+			std::string response;
+			if (game.sellTower(col, row)) {
+				response = "tower sold";
+			}
+			else response = "tower not sold";
+			
 			sendMessage(response);
 		}
 		else if (command.find("upgradeTower") != std::string::npos) {
@@ -60,12 +61,12 @@ void GameServer::handleClient()
 
 			this->parseUpgradeTowerMessage(command, col, row);
 
-			game.upgradeTower(col, row);
-			std::string response = "upgraded";
-			sendMessage(response);
-		}
-		else if (command == "getAvailableTiles") {
-			std::string response = Grid::getAvailableTilesString();
+			std::string response;
+
+			if (game.upgradeTower(col, row)) {
+				response = "tower upgraded";
+			}
+			else response = "tower not upgraded";
 			sendMessage(response);
 		}
 		else if (command == "pause") {
@@ -100,9 +101,13 @@ void GameServer::handleClient()
 			std::string response = "game reset";
 			sendMessage(response);
 		}
-		else if (command == "skip") {
-			game.skip();
-			std::string response = "level skipped";
+		else if (command == "skip" || command == "next" || command == "nextLevel") {
+
+			std::string response;
+			if (game.skip()) {
+				response = "level skipped";
+			}
+			else response = "level not skipped";
 			sendMessage(response);
 		}
 		else if (command == "speedUp") {
@@ -125,18 +130,12 @@ void GameServer::handleClient()
 			}
 			sendMessage(response);
 		}
+		else if (command == "getAvailableTiles") {
+			std::string response = game.getAvailableTilesString();
+			sendMessage(response);
+		}
 
 	}
-}
-
-void GameServer::remotePlaceTower(int col, int row, TowerType type)
-{
-	game.placeTower(col, row, type);
-}
-
-void GameServer::remoteSellTower(int col, int row)
-{
-	game.sellTower(col, row);
 }
 
 //placeTower col row type

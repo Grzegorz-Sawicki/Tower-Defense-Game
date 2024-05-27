@@ -47,6 +47,7 @@ private:
 	sf::Sprite spriteBase;
 	sf::Sprite spriteBarrel;
 	sf::Texture texture;
+	sf::Text levelText;
 
 	sf::CircleShape radiusCircle;
 	bool showRadiusCircle = false;
@@ -93,7 +94,7 @@ private:
 	sf::Text upgradeText;
 
 	void initSprites(json texture);
-	void initText();
+	void initTexts();
 	void initRadiusCircle();
 	void shoot(Enemy* enemy);
 	void rotateTowardsEnemy(Enemy* enemy);
@@ -103,6 +104,9 @@ public:
 	Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType type);
 	Tower(const std::vector<Enemy*>& enemies, std::vector<Tile*> tiles, TowerType type);
 	virtual ~Tower();
+
+	void pauseClocks();
+	void resumeClocks();
 
 	sf::FloatRect getBounds();
 	sf::Vector2f getPosition();
@@ -126,7 +130,7 @@ public:
 
 	//Functions
 	TowerUpgrade getNextUpgrade();
-	void upgrade(unsigned int& gold);
+	void upgrade(unsigned int& gold, bool instant=false);
 	bool canUpgrade(unsigned int& gold);
 	bool hasNextUpgrade();
 
@@ -136,4 +140,5 @@ public:
 	void updateProjectiles();
 	void render(sf::RenderTarget* target);
 	void renderProjectiles(sf::RenderTarget* target);
+	void renderRadiusCircle(sf::RenderTarget* target);
 };

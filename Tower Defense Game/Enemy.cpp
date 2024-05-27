@@ -220,11 +220,6 @@ Enemy::Enemy(const Enemy& other, sf::Vector2f offset)
 	this->initHealthBar();
 }
 
-Enemy::~Enemy()
-{
-
-}
-
 sf::Vector2f Enemy::getPosition(bool ignoreOffset)
 {
 	if (ignoreOffset) return this->getPosition() - this->getPositionOffset();
@@ -336,12 +331,14 @@ void Enemy::setStun(float length)
 
 void Enemy::takeDamage(int damage)
 {
-	this->hp -= damage;
-	if (!this->dead && this->hp <= 0) {
-		this->die();
-	}
-	else {
-		this->updateHealthBar();
+	if (!this->dead) {
+		this->hp -= damage;
+		if (this->hp <= 0) {
+			this->die();
+		}
+		else {
+			this->updateHealthBar();
+		}
 	}
 }
 

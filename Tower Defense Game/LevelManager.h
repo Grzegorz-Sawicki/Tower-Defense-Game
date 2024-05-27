@@ -31,7 +31,7 @@ public:
 	LevelManager(std::vector<Enemy*> &enemies);
 	~LevelManager();
 
-	void nextLevel();
+	bool nextLevel();
 	void pause();
 	void resume();
 

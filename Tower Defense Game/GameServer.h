@@ -12,8 +12,6 @@ private:
 	sf::TcpSocket client;
 
 	void handleClient();
-	void remotePlaceTower(int col, int row, TowerType type);
-	void remoteSellTower(int col, int row);
 
 	void parsePlaceTowerMessage(std::string message, int& col, int& row, TowerType& type);
 	void parseSellTowerMessage(std::string message, int& col, int& row);

@@ -81,6 +81,7 @@ private:
 	sf::RectangleShape scrollBlockBox;
 
 	std::vector<Enemy*> enemies;
+	std::vector<Enemy*> enemiesSorted;
 	std::vector<Tower*> towers;
 
 	unsigned timer;
@@ -116,7 +117,7 @@ private:
 	void endGame();
 	void pause();
 	void unpause();
-	void skip();
+	bool skip();
 	bool speedUp();
 	bool speedDown();
 
@@ -142,6 +143,8 @@ public:
 	void run();
 
 	std::vector<Enemy*>& getEnemies();
+
+	std::string getAvailableTilesString();
 
 	void updatePollEvents();
 	void update();

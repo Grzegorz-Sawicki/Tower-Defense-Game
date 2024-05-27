@@ -157,7 +157,7 @@ void Game::initVariables()
 
 void Game::initGrid()
 {
-	Grid::getInstance(this->enemies);
+	Grid::getInstance(this->enemiesSorted);
 	Grid::createPaths();
 	Grid::visualizePaths();
 }
@@ -176,19 +176,18 @@ void Game::reset()
 {
 	this->initVariables();
 
-	std::vector<Enemy*> enemiesCurrent = this->enemies;
-	for (auto* enemy : enemiesCurrent)
+	for (auto* enemy : this->enemies)
 	{
-		enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
 		delete enemy;
 	}
+	this->enemies.clear();
+	this->enemiesSorted.clear();
 
-	std::vector<Tower*> towersCurrent = this->towers;
-	for (auto* tower : towersCurrent)
+	for (auto* tower : towers)
 	{
-		towers.erase(std::remove(towers.begin(), towers.end(), tower), towers.end());
 		delete tower;
 	}
+	this->towers.clear();
 
 	delete this->levelManager;
 	this->levelManager = new LevelManager(this->enemies);
@@ -222,36 +221,50 @@ void Game::sellTower()
 }
 
 void Game::printEnemies() {
-	for (const auto& enemy : enemies) {
+	for (const auto& enemy : enemiesSorted) {
 		std::cout << ";" << enemy->getDistanceFromExit() << " " << enemy->getLevel() << " " << utils::enemyTypeToString(enemy->getType()) << ";";
 	}
 	std::cout << std::endl;
 }
 
 void Game::sortEnemies() {
-	std::sort(enemies.begin(), enemies.end(), [](Enemy* a, Enemy* b) {
+	this->enemiesSorted = enemies;
+
+	std::sort(enemiesSorted.begin(), enemiesSorted.end(), [](Enemy* a, Enemy* b) {
 		return a->getDistanceFromExit() < b->getDistanceFromExit();
 	});
 }
 
 void Game::endGame()
 {
-
+	this->window->close();
+	this->isRunning->store(false);
+	this->gameServer->client.disconnect();
+	this->gameServer->listener->close();
 }
 
 void Game::pause() {
 	this->paused = true;
 	this->levelManager->pause();
+	for (auto* tower : this->towers) {
+		tower->pauseClocks();
+	}
 }
 
 void Game::unpause() {
 	this->paused = false;
 	this->levelManager->resume();
+	for (auto* tower : this->towers) {
+		tower->resumeClocks();
+	}
 }
 
-void Game::skip() {
-	this->scoreSkip += this->timer * 2;
-	this->levelManager->nextLevel();
+bool Game::skip() {
+	if (this->levelManager->nextLevel()) {
+		this->scoreSkip += this->timer * 2;
+		return true;
+	}
+	return false;
 }
 
 bool Game::speedUp() {
@@ -284,7 +297,6 @@ Game::~Game()
 	for (auto* enemy : this->enemies)
 	{
 		enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
-		//error cos of pausableClock
 		//delete enemy;
 	}
 
@@ -327,12 +339,17 @@ void Game::gameLoop() {
 	}
 }
 
+std::string Game::getAvailableTilesString()
+{
+	return Grid::getAvailableTilesString();
+}
+
 bool Game::placeTower(int col, int row, TowerType type)
 {
 	unsigned int cost = this->dummyTowers[type]->getCost();
 	if (Grid::canPlaceTower(col, row) && cost <= this->gold && !this->paused) {
 		this->gold -= cost;
-		Tower* t = Grid::getInstance(this->enemies).placeTower(col, row, type);
+		Tower* t = Grid::getInstance(this->enemiesSorted).placeTower(col, row, type);
 		this->towers.push_back(t);
 		Grid::resetPaths();
 		Grid::createPaths();
@@ -354,7 +371,7 @@ Tower* Game::getTowerByTile(Tile& tile) {
 
 bool Game::sellTower(int col, int row)
 {
-	Tile& tile = Grid::getInstance(this->enemies).getTile(col, row);
+	Tile& tile = Grid::getInstance(this->enemiesSorted).getTile(col, row);
 	Tower* tower = this->getTowerByTile(tile);
 
 	if (tower != nullptr && !this->paused) {
@@ -371,12 +388,14 @@ bool Game::sellTower(int col, int row)
 }
 
 bool Game::upgradeTower(int col, int row) {
-	Tile& tile = Grid::getInstance(this->enemies).getTile(col, row);
+	Tile& tile = Grid::getInstance(this->enemiesSorted).getTile(col, row);
 	Tower* tower = this->getTowerByTile(tile);
 
 	if (tower != nullptr && !this->paused) {
 		if (tower->canUpgrade(this->gold)) {
-			tower->upgrade(this->gold);
+			bool instant = false;
+			if (!this->started) instant = true;
+			tower->upgrade(this->gold, instant);
 			return true;
 		}
 	}
@@ -396,7 +415,7 @@ void Game::updatePollEvents()
 		if (!this->paused) {
 			switch (e.type) {
 			case sf::Event::Closed:
-				this->window->close();
+				this->endGame();
 				break;
 			case sf::Event::MouseMoved:
 				if (this->placeMode) {
@@ -434,7 +453,9 @@ void Game::updatePollEvents()
 					if (this->showInfoUpgrade) {
 						if (mouseOnShape(this->infoWindowUpgrade->getUpgradeButtonShape())) {
 							if (this->selectedTower->canUpgrade(this->gold)) {
-								this->selectedTower->upgrade(this->gold);
+								bool instant = false;
+								if (!this->started) instant = true;
+								this->selectedTower->upgrade(this->gold, instant);
 							}
 						}
 					}
@@ -453,15 +474,19 @@ void Game::updatePollEvents()
 							this->infoWindowTower = new InfoWindowTower(*tower, 0);
 							this->showInfoWindow = true;
 							this->showInfoTower = true;
-							tower->setShowRadiusCircle(true);
 							break;
 						}
 						this->showInfoTower = false;
 						this->showInfoTowerSell = false;
 						this->showInfoUpgrade = false;
-						tower->setShowRadiusCircle(false);
 					}
 					if (!this->showInfoTower) {
+						//RESET RADIUS CIRCLES
+						for (auto* tower : this->towers)
+						{
+							tower->setShowRadiusCircle(false);
+						}
+
 						for (auto* tower : this->towers)
 						{
 							if (mouseOnSprite(tower->getSpriteBase())) {
@@ -608,8 +633,8 @@ void Game::updatePollEvents()
 				}
 				break;
 			case sf::Event::Closed:
-				this->window->close();
-				this->isRunning->store(false);
+				this->endGame();
+
 				break;
 			case sf::Event::KeyPressed:
 				if (e.key.code == sf::Keyboard::P) {
@@ -631,7 +656,7 @@ void Game::updatePollEvents()
 				}
 				break;
 			case sf::Event::Closed:
-				this->window->close();
+				this->endGame();
 				this->isRunning->store(false);
 				break;
 			default:
@@ -668,10 +693,8 @@ void Game::update()
 					deadSpawns.emplace_back(enemy);
 				}
 
-				//DOESN'T ALWAYS WORK, BEWARE
 				enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
 
-				//THINK OF BETTER WAY
 				//delete enemy;
 				continue;
 			}
@@ -685,7 +708,8 @@ void Game::update()
 				}
 				enemy->getCurrentTile()->occupyDec();
 				enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
-				//delete enemy;
+				enemy->die();
+				delete enemy;
 			}
 		}
 
@@ -720,7 +744,6 @@ void Game::render()
 
 	for (auto* box : this->UIBoxes) {
 		this->window->draw(*box);
-		//std::cout << static_cast<int>(box.getFillColor().r) << std::endl;
 	}
 
 	for (auto* text : this->texts) {
@@ -741,8 +764,14 @@ void Game::render()
 
 	for (auto* tower : this->towers)
 	{
+		tower->renderRadiusCircle(this->window);
+	}
+
+	for (auto* tower : this->towers)
+	{
 		tower->renderProjectiles(this->window);
 	}
+
 
 	//PAUSE/RESUME BUTTONS
 	if (this->paused) {

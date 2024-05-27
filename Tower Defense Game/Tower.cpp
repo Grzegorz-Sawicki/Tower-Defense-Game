@@ -84,7 +84,7 @@ void Tower::initSprites(json texture)
 
 }
 
-void Tower::initText()
+void Tower::initTexts()
 {
 	//upgrade text
 	this->font = FontManager::instance().getFont("Fonts/PixellettersFull.ttf");
@@ -94,6 +94,10 @@ void Tower::initText()
 	sf::FloatRect textRect = upgradeText.getLocalBounds();
 	upgradeText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 	upgradeText.setPosition(this->spriteBase.getPosition());
+
+	this->levelText = sf::Text(std::to_string(this->level), this->font, 15);
+	this->levelText.setPosition(this->getPosition() + sf::Vector2f(8.f, -1.f));
+	this->levelText.setFillColor(sf::Color::Black);
 }
 
 void Tower::initRadiusCircle()
@@ -131,7 +135,7 @@ sf::Time Tower::getNextUpgradeLength()
 Tower::Tower(const std::vector<Enemy*>& enemies, int posX, int posY, TowerType type) : enemies(enemies), posX(posX), posY(posY), type(type)
 {
 	this->handleJsonData();
-	this->initText();
+	this->initTexts();
 	this->initRadiusCircle();
 
 	this->sellPrice = this->cost * 0.75;
@@ -155,7 +159,7 @@ Tower::Tower(const std::vector<Enemy*>& enemies, std::vector<Tile*> tiles, Tower
 	}
 
 	this->handleJsonData();
-	this->initText();
+	this->initTexts();
 	this->initRadiusCircle();
 
 	this->sellPrice = this->cost * 0.75;
@@ -180,6 +184,18 @@ sf::FloatRect Tower::getBounds()
 sf::Vector2f Tower::getPosition()
 {
 	return this->spriteBase.getPosition();
+}
+
+void Tower::pauseClocks()
+{
+	this->clock.pause();
+	this->upgradeClock.pause();
+}
+
+void Tower::resumeClocks()
+{
+	this->clock.resume();
+	this->upgradeClock.resume();
 }
 
 const std::vector<Enemy*>& Tower::getEnemies()
@@ -259,14 +275,16 @@ TowerUpgrade Tower::getNextUpgrade()
 	return this->towerUpgrades[this->level - 1];
 }
 
-void Tower::upgrade(unsigned int& gold)
+void Tower::upgrade(unsigned int& gold, bool instant)
 {
-	this->upgradeTime = this->getNextUpgradeLength();
+	if (instant) this->upgradeTime = sf::seconds(0);
+	else this->upgradeTime = this->getNextUpgradeLength();
 	this->upgrading = true;
 	this->upgradeClock.restart();
 
 	TowerUpgrade upgrade = this->towerUpgrades[this->level - 1];
 	this->level++;
+	this->levelText.setString(std::to_string(this->level));
 	this->cost += upgrade.cost;
 	this->damage = upgrade.damage;
 	this->range = upgrade.range;
@@ -411,7 +429,7 @@ void Tower::render(sf::RenderTarget* target)
 	if (this->upgrading) target->draw(this->upgradeText);
 	else target->draw(this->spriteBarrel);
 
-	if (this->showRadiusCircle) target->draw(this->radiusCircle);
+	target->draw(this->levelText);
 }
 
 void Tower::renderProjectiles(sf::RenderTarget* target)
@@ -420,6 +438,11 @@ void Tower::renderProjectiles(sf::RenderTarget* target)
 	{
 		projectile->render(target);
 	}
+}
+
+void Tower::renderRadiusCircle(sf::RenderTarget* target)
+{
+	if (this->showRadiusCircle) target->draw(this->radiusCircle);
 }
 
 TowerUpgrade::TowerUpgrade()

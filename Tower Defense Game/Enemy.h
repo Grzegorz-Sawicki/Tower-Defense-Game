@@ -65,7 +65,6 @@ private:
 public:
 	Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss, int gold, int level);
 	Enemy(const Enemy& other, sf::Vector2f offset);
-	virtual ~Enemy();
 
 	sf::Vector2f getPosition(bool ignoreOffset=false);
 	sf::Vector2f getPositionOffset();
