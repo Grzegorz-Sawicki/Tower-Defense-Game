@@ -7,6 +7,8 @@
 class LevelManager
 {
 private:
+	void handleJsonData();
+
 	std::vector<Enemy*> *enemies;
 	std::vector<Level*> levels;
 
@@ -16,16 +18,14 @@ private:
 	PausableClock scrollClock;
 	int currentScrollCount=0;
 
-	void handleJsonData();
-
-	int currentLevel;
+	int currentLevel=0;
+	int maxLevel;
+	bool canSpawn = false;
 	int remainingEnemies;
 	sf::Time levelTimer;
 	PausableClock levelClock;
 
 	Level* getCurrentLevel();
-
-	bool canSpawn;
 
 public:
 	LevelManager(std::vector<Enemy*> &enemies);
@@ -36,6 +36,8 @@ public:
 	void resume();
 
 	int getLevel();
+	Level* getLevelObject();
+	int getMaxLevel();
 	sf::Time getLevelTimer();
 	sf::Time getRemainingTime();
 	bool canSpawnEnemies();

@@ -134,6 +134,18 @@ void GameServer::handleClient()
 			std::string response = game.getAvailableTilesString();
 			sendMessage(response);
 		}
+		else if (command == "getPlacedTowers") {
+			std::string response = game.getPlacedTowersString();
+			sendMessage(response);
+		}
+		else if (command == "getInfo") {
+			std::string response = game.getInfoString();
+			sendMessage(response);
+		}
+		else if (command == "getEnemies") {
+			std::string response = game.getEnemiesString();
+			sendMessage(response);
+		}
 
 	}
 }

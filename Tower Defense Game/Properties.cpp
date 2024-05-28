@@ -43,6 +43,7 @@ std::string Properties::textScore = "Score: ";
 
 std::string Properties::textPause = "Paused: ";
 sf::Vector2f Properties::textPausePosition = sf::Vector2f(230.f, 260.f);
+sf::Vector2f Properties::textEndGameScorePosition = sf::Vector2f(230.f, 300.f);
 
 std::string	Properties::jsonTowersFileName = "Data/towers.json";
 std::string Properties::jsonUpgradesFileName = "Data/tower_upgrades.json";

@@ -14,8 +14,8 @@ private:
     std::map<Path, int> distanceFromExits;
     std::map<Path, int> straightDistanceFromExits;
 
-    int occupyNumber;
-    bool occupied;
+    int occupyNumber=0;
+    bool occupied=false;
     TileType type;
 
 public:

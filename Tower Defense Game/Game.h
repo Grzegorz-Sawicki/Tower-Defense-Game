@@ -77,6 +77,7 @@ private:
 
 	//GameOver screen
 	sf::Text* textGameOver;
+	sf::Text textGameOverScore;
 
 	sf::RectangleShape scrollBlockBox;
 
@@ -92,6 +93,7 @@ private:
 	unsigned scoreSkip=0;
 
 	bool gameOver = false;
+	void doGameOver();
 	bool started = false;
 	bool paused;
 	bool placeMode;
@@ -132,6 +134,8 @@ private:
 	bool sellTower(int col, int row);
 	bool upgradeTower(int col, int row);
 
+	bool isGameWon();
+
 public:
 	//Constructors and Destructors
 	Game();
@@ -145,6 +149,9 @@ public:
 	std::vector<Enemy*>& getEnemies();
 
 	std::string getAvailableTilesString();
+	std::string getPlacedTowersString();
+	std::string getInfoString();
+	std::string getEnemiesString();
 
 	void updatePollEvents();
 	void update();

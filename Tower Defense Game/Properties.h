@@ -47,6 +47,7 @@ struct Properties
 
 	static std::string textPause;
 	static sf::Vector2f textPausePosition;
+	static sf::Vector2f textEndGameScorePosition;
 
 	static std::string jsonTowersFileName;
 	static std::string jsonUpgradesFileName;

@@ -11,15 +11,14 @@ private:
 	PausableClock spawnClock;
 	sf::Time enemySpawnTimer;
 
-	int gold;
+	int number;
 	unsigned count;
+	bool active=false;
+
+	int gold;
 	unsigned health;
 	EnemyType type;
 	bool boss;
-	int number;
-	//unsigned enemyType;
-
-	bool active;
 
 	void spawnEnemy();
 

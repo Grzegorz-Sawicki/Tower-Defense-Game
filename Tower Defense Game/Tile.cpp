@@ -6,8 +6,6 @@ Tile::Tile(int row, int col, float x, float y, sf::Color baseColor, TileType typ
     this->shape.setOrigin(this->shape.getGlobalBounds().width / 2, this->shape.getGlobalBounds().height / 2);
     this->baseColor = baseColor;
     this->shape.setFillColor(this->baseColor);
-    this->occupied = false;
-    this->occupyNumber = 0;
     this->pathArrows[Path::HORIZONTAL] = Arrow::DEFAULT;
     this->pathArrows[Path::VERTICAL] = Arrow::DEFAULT;
     this->distanceFromExits[Path::HORIZONTAL] = -1;
@@ -145,6 +143,5 @@ void Tile::occupyInc()
 
 void Tile::occupyDec()
 {
-    //ENTRANCE DOESN"T SEEM TO WORK
     if (this->occupyNumber > 0) this->occupyNumber--;
 }

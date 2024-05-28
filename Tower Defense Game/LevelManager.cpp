@@ -35,6 +35,7 @@ void LevelManager::handleJsonData()
 		this->levelScrollBoxes.emplace_back(new LevelScrollBox(this->levels[lvlCount - 1], (lvlCount - 1) * Properties::levelScrollBoxSize.x));
 		
 	}
+	this->maxLevel = lvlCount;
 }
 
 Level* LevelManager::getCurrentLevel()
@@ -48,10 +49,8 @@ LevelManager::LevelManager(std::vector<Enemy*> &enemies) : enemies(&enemies)
 
 	this->levelScrollOutline = new LevelScrollBox();
 	this->scrollTimer = Properties::levelTimer / Properties::levelScrollBoxSize.x;
-
-	this->canSpawn = false;
-	this->currentLevel = 0;
 	this->levelTimer = Properties::levelTimer;
+
 	this->nextLevel();
 }
 
@@ -77,7 +76,6 @@ bool LevelManager::nextLevel()
 
 		if (this->currentLevel > 1) {
 			int requiredScrolls = static_cast<int>(Properties::levelScrollBoxSize.x);
-			std::cout << this->currentScrollCount << " / " << requiredScrolls << std::endl;
 
 			if (this->currentScrollCount < requiredScrolls) {
 				for (auto* lbox : this->levelScrollBoxes) {
@@ -85,7 +83,6 @@ bool LevelManager::nextLevel()
 				}
 			}
 		}
-
 		this->currentScrollCount = 0;
 		return true;
 	}
@@ -113,6 +110,16 @@ void LevelManager::resume()
 int LevelManager::getLevel()
 {
 	return this->currentLevel;
+}
+
+Level* LevelManager::getLevelObject()
+{
+	return this->getCurrentLevel();
+}
+
+int LevelManager::getMaxLevel()
+{
+	return this->maxLevel;
 }
 
 sf::Time LevelManager::getLevelTimer()

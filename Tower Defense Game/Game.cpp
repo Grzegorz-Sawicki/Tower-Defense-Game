@@ -134,6 +134,11 @@ void Game::initUI()
 	this->textGameOver = new sf::Text("GAME OVER", this->font, 50);
 	this->textGameOver->setFillColor(sf::Color::Red);
 	this->textGameOver->setPosition(Properties::textPausePosition);
+	
+	this->textGameOverScore.setFont(this->font);
+	this->textGameOverScore.setCharacterSize(50);
+	this->textGameOverScore.setFillColor(sf::Color::Red);
+	this->textGameOverScore.setPosition(Properties::textEndGameScorePosition);
 
 	this->scrollBlockBox.setFillColor(Properties::darkGray);
 	this->scrollBlockBox.setPosition(Properties::windowWidth - Properties::UIButtonBoxWidth, Properties::windowHeight - Properties::UILevelBoxHeight);
@@ -160,6 +165,13 @@ void Game::initGrid()
 	Grid::getInstance(this->enemiesSorted);
 	Grid::createPaths();
 	Grid::visualizePaths();
+}
+
+void Game::doGameOver()
+{
+	this->gameServer->sendMessage("GAME OVER. SCORE = " + std::to_string(this->score) + "+" + std::to_string(this->scoreSkip));
+	this->gameOver = true;
+	this->paused = true;
 }
 
 bool Game::mouseOnSprite(sf::Sprite sprite)
@@ -232,7 +244,7 @@ void Game::sortEnemies() {
 
 	std::sort(enemiesSorted.begin(), enemiesSorted.end(), [](Enemy* a, Enemy* b) {
 		return a->getDistanceFromExit() < b->getDistanceFromExit();
-	});
+		});
 }
 
 void Game::endGame()
@@ -268,7 +280,7 @@ bool Game::skip() {
 }
 
 bool Game::speedUp() {
-	if (!this->started) {
+	if (!this->started && this->timeScale <= 10.0) {
 		this->setTimeScale(this->timeScale + 1.0);
 		return true;
 	}
@@ -297,14 +309,11 @@ Game::~Game()
 	for (auto* enemy : this->enemies)
 	{
 		enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
-		//delete enemy;
 	}
 
 	for (auto* tower : this->towers)
 	{
-		//HEAP CORR
 		towers.erase(std::remove(towers.begin(), towers.end(), tower), towers.end());
-		//delete tower;
 	}
 
 	for (auto* box : this->UIBoxes)
@@ -339,9 +348,76 @@ void Game::gameLoop() {
 	}
 }
 
+bool Game::isGameWon()
+{
+	bool cond1 = this->levelManager->getLevel() == this->levelManager->getMaxLevel();
+	bool cond2 = this->enemies.size() <= 1;
+	bool cond3 = this->levelManager->getLevelObject()->getEnemyCount() == 0;
+	return cond1 && cond2 && cond3;
+}
+
 std::string Game::getAvailableTilesString()
 {
 	return Grid::getAvailableTilesString();
+}
+
+std::string Game::getPlacedTowersString()
+{
+	std::string output = ";";
+
+	for (auto* tower : this->towers) {
+		Tile* mainTile = tower->getTiles()[0];
+		int col = mainTile->getCol();
+		int row = mainTile->getRow();
+		std::string typeStr = utils::towerToString(tower->getType());
+		int level = tower->getLevel();
+
+		output += std::to_string(col) + " "
+			+ std::to_string(row) + " "
+			+ typeStr + " "
+			+ std::to_string(level) + ";";
+	}
+
+	return output;
+}
+
+std::string Game::getInfoString()
+{
+	std::string timeString = std::to_string(this->timer);
+	std::string levelString = std::to_string(this->level);
+	std::string livesString = std::to_string(this->lives);
+	std::string goldString = std::to_string(this->gold);
+	std::string scoreString = std::to_string(this->score) + "+" + std::to_string(this->scoreSkip);
+
+	std::string output = timeString + " " + levelString + " " + livesString + " " + goldString + " " + scoreString;
+
+	return output;
+
+}
+
+std::string Game::getEnemiesString()
+{
+	std::string output = ";";
+
+	for (auto* enemy : this->enemiesSorted) {
+		Tile* tile = enemy->getCurrentTile();
+
+		int distFromExit = enemy->getDistanceFromExit();
+		int col = tile->getCol();
+		int row = tile->getRow();
+		std::string typeStr = utils::enemyTypeToString(enemy->getType());
+		int level = enemy->getLevel();
+		int health = enemy->getHp();
+
+		output += std::to_string(distFromExit) + " "
+			+ std::to_string(col) + " "
+			+ std::to_string(row) + " "
+			+ typeStr + " "
+			+ std::to_string(level) + " "
+			+ std::to_string(health) + ";";
+	}
+
+	return output;
 }
 
 bool Game::placeTower(int col, int row, TowerType type)
@@ -565,7 +641,6 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::KeyPressed:
 				if (e.key.code == sf::Keyboard::Escape) {
-					//PROBABLY WORKS
 					this->showInfoWindow = false;
 					this->showInfoTower = false;
 					this->showInfoTowerSell = false;
@@ -609,7 +684,7 @@ void Game::updatePollEvents()
 					this->placingTower = static_cast<TowerType>(5);
 				}
 				if (e.key.code == sf::Keyboard::G) {
-					this->gold += 10;
+					//this->gold += 10;
 				}
 				if (e.key.code == sf::Keyboard::Equal) {
 					this->speedUp();
@@ -618,7 +693,7 @@ void Game::updatePollEvents()
 					this->speedDown();
 				}
 				if (e.key.code == sf::Keyboard::N) {
-					this->printEnemies();
+					//this->printEnemies();
 				}
 
 			default:
@@ -634,7 +709,6 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::Closed:
 				this->endGame();
-
 				break;
 			case sf::Event::KeyPressed:
 				if (e.key.code == sf::Keyboard::P) {
@@ -657,7 +731,6 @@ void Game::updatePollEvents()
 				break;
 			case sf::Event::Closed:
 				this->endGame();
-				this->isRunning->store(false);
 				break;
 			default:
 				break;
@@ -695,15 +768,13 @@ void Game::update()
 
 				enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
 
-				//delete enemy;
 				continue;
 			}
 			if (enemy->getPosition().x > Properties::enemyBarrierX || enemy->getPosition().y > Properties::enemyBarrierY) {
 				this->lives--;
 				gameServer->sendMessage("Lives: " + std::to_string(this->lives));
-				if (this->lives <= 0) {
-					this->gameOver = true;
-					this->paused = true;
+				if (this->lives <= 0 || this->isGameWon()) {
+					this->doGameOver();
 					break;
 				}
 				enemy->getCurrentTile()->occupyDec();
@@ -778,6 +849,8 @@ void Game::render()
 		this->window->draw(*this->UIPauseBox);
 		if (this->gameOver) {
 			this->window->draw(*this->textGameOver);
+			this->textGameOverScore.setString("Score = " + std::to_string(this->score) + "+" + std::to_string(this->scoreSkip));
+			this->window->draw(textGameOverScore);
 		}
 		else {
 			this->window->draw(*this->textPause);

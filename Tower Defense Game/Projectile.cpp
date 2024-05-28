@@ -121,7 +121,6 @@ void Projectile::update()
 	this->sprite.move(velocity);
 	if (this->isAoe) this->aoe->move(velocity);
 
-	//temp
 	if (length <= 1.5)
 	{
 		this->destroyed = true;
@@ -129,7 +128,6 @@ void Projectile::update()
 		if (this->isAoe) this->pulseAoE();
 		if (this->isSlow && !this->isAoe) this->slowEnemy();
 		if (this->isStun && !this->isAoe) this->stunEnemy();
-		//std::cout << "Enemy " << this->targetEnemy << " takes " << damage << " damage. It now has " << this->targetEnemy->getHp() << " health!\n";
 	}
 
 }

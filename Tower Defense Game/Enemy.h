@@ -17,37 +17,37 @@ private:
 	json effects;
 	void handleJsonData();
 
+	bool dead=false;
+
 	int hp;
 	int maxhp;
 	float moveSpeed;
 	float moveSpeedBase;
-	int gold = 0;
 	int level = 0;
+	int gold = 0;
 
 	bool boss;
 	bool group=false;
 	bool flying=false;
 	bool spawn=false;
 	bool immune=false;
-
-	bool dead;
-	Path path;
 	EnemyType type;
-	Arrow currentArrow;
-	sf::Vector2f direction;
-	Tile* currentTile;
-	bool reachedEntrance;
-	int distanceFromExit;
 
-	bool slowed=false;
-	float slowValue=0.f;
+	bool slowed = false;
+	float slowValue = 0.f;
 	sf::Time slowLength;
-	sf::Clock slowClock;
+	PausableClock slowClock;
 
 	bool stunned = false;
 	sf::Time stunLength;
-	sf::Clock stunClock;
+	PausableClock stunClock;
 
+	Path path;
+	Tile* currentTile;
+	Arrow currentArrow;
+	sf::Vector2f direction;
+	bool reachedEntrance = false;
+	int distanceFromExit;
 
 	//Functions
 	void initSprite(json texture);
@@ -60,7 +60,6 @@ private:
 	sf::Vector2f createSpawnDirection();
 
 	void unDie();
-
 
 public:
 	Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss, int gold, int level);

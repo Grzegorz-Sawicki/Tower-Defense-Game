@@ -38,11 +38,9 @@ void Grid::draw(sf::RenderWindow& window) {
 
 void Grid::handleMouseMove(const sf::Vector2f& mousePos)
 {
-	// Calculate the index of the tile that the mouse is currently over
 	int col = static_cast<int>((-Properties::gridLeftOffset + mousePos.x) / m_tileSize);
 	int row = static_cast<int>((-Properties::gridTopOffset + mousePos.y) / m_tileSize);
 
-	// Reset the color of all tiles
 	for (unsigned int i = 0; i < m_rows; ++i) {
 		for (unsigned int j = 0; j < m_cols; ++j) {
 			m_tiles[i][j].resetColor();
@@ -59,7 +57,6 @@ void Grid::handleMouseMove(const sf::Vector2f& mousePos)
 		}
 	}
 
-	// Highlight the 2x2 area of tiles if the mouse is within bounds
 	if (row >= 0 && row < m_rows - 1 && col >= 0 && col < m_cols - 1) {
 		for (int i = row; i <= row + 1; ++i) {
 			for (int j = col; j <= col + 1; ++j) {
@@ -289,21 +286,6 @@ void Grid::createPath(Path path) {
 			}
 		}
 
-
-		//std::map<Arrow, Tile*>::iterator it;
-
-		//for (it = neighbors.begin(); it != neighbors.end(); ++it) {
-		//	if (it->second != nullptr) {
-		//		if (!arrowSet && it->second->getArrow(path) != Arrow::DEFAULT) {
-		//			tile->setArrow(it->first);
-		//			arrowSet = true;
-		//		}
-		//		else if (!it->second->isOccupied() && it->second->getArrow(path) == Arrow::DEFAULT) {
-		//			enqueueUnique(it->second, tile->getDistanceFromExit());
-		//		}
-		//	}
-		//}
-
 		if (path == Path::HORIZONTAL) {
 			if (right != nullptr) {
 				if (!arrowSet && right->getArrow(path) != Arrow::DEFAULT) {
@@ -405,63 +387,56 @@ void Grid::createPaths() {
 
 
 void Grid::visualizePath(Path path) {
-	//for (unsigned int i = 0; i < m_rows; ++i) {
-	//	for (unsigned int j = 0; j < m_cols; ++j) {
-	//		char symbol;
-	//		switch (m_tiles[i][j].getArrow(path)) {
-	//		case Arrow::UP:
-	//			symbol = '^';
-	//			break;
-	//		case Arrow::RIGHT:
-	//			symbol = '>';
-	//			break;
-	//		case Arrow::LEFT:
-	//			symbol = '<';
-	//			break;
-	//		case Arrow::DOWN:
-	//			symbol = 'v';
-	//			break;
-	//		case Arrow::UPRIGHT:
-	//			symbol = 'n';
-	//			break;
-	//		case Arrow::DOWNRIGHT:
-	//			symbol = 'u';
-	//			break;
-	//		case Arrow::UPLEFT:
-	//			symbol = '3';
-	//			break;
-	//		case Arrow::DOWNLEFT:
-	//			symbol = 'e';
-	//			break;
-	//		default:
-	//			symbol = ' ';
-	//		}
-	//		std::cout << symbol;
-	//	}
-	//	std::cout << "\n";
-	//}
-	//std::cout << "\n\n";
+	for (unsigned int i = 0; i < m_rows; ++i) {
+		for (unsigned int j = 0; j < m_cols; ++j) {
+			char symbol;
+			switch (m_tiles[i][j].getArrow(path)) {
+			case Arrow::UP:
+				symbol = '^';
+				break;
+			case Arrow::RIGHT:
+				symbol = '>';
+				break;
+			case Arrow::LEFT:
+				symbol = '<';
+				break;
+			case Arrow::DOWN:
+				symbol = 'v';
+				break;
+			case Arrow::UPRIGHT:
+				symbol = 'n';
+				break;
+			case Arrow::DOWNRIGHT:
+				symbol = 'u';
+				break;
+			case Arrow::UPLEFT:
+				symbol = '3';
+				break;
+			case Arrow::DOWNLEFT:
+				symbol = 'e';
+				break;
+			default:
+				symbol = ' ';
+			}
+			std::cout << symbol;
+		}
+		std::cout << "\n";
+	}
+	std::cout << "\n\n";
 
-	//for (unsigned int i = 0; i < m_rows; ++i) {
-	//	for (unsigned int j = 0; j < m_cols; ++j) {
-	//		std::cout << static_cast<int>(m_tiles[i][j].getType());
-	//	}
-	//	std::cout << "\n";
-	//}
-	//std::cout << "\n\n";
+	for (unsigned int i = 0; i < m_rows; ++i) {
+		for (unsigned int j = 0; j < m_cols; ++j) {
+			std::cout << static_cast<int>(m_tiles[i][j].getType());
+		}
+		std::cout << "\n";
+	}
+	std::cout << "\n\n";
 
-	//for (unsigned int i = 0; i < m_rows; ++i) {
-	//	for (unsigned int j = 0; j < m_cols; ++j) {
-	//		std::cout << std::setw(2) << std::setfill('0') << m_tiles[i][j].getDistanceFromExit();
-	//	}
-	//	std::cout << "\n";
-	//}
-	//std::cout << "\n\n";
 }
 
 void Grid::visualizePaths() {
-	visualizeOccupy();
-	//visualizePath(Path::HORIZONTAL);
+	//visualizeOccupy();
+	visualizePath(Path::HORIZONTAL);
 	//visualizePath(Path::VERTICAL);
 }
 
@@ -555,7 +530,6 @@ int Grid::mousePosToRow(const sf::Vector2i& mousePos) {
 
 Tower* Grid::placeTower(const sf::Vector2i& mousePos, TowerType type)
 {
-	// Calculate the index of the tile that the mouse is currently over
 	int col = Grid::mousePosToCol(mousePos);
 	int row = Grid::mousePosToRow(mousePos);
 
@@ -569,7 +543,6 @@ Tower* Grid::placeTower(int col, int row, TowerType type) {
 		for (int i = row; i <= row + 1; ++i) {
 			for (int j = col; j <= col + 1; ++j) {
 				towerTiles.emplace_back(&m_tiles[i][j]);
-				//m_tiles[i][j].setType(TileType::TOWER);
 			}
 		}
 	}
@@ -593,7 +566,7 @@ std::string Grid::getAvailableTilesString() {
 						available = false;
 						break;
 					}
-					if (m_tiles[row][col].getType() != TileType::DEFAULT || m_tiles[row][col].getOccupyNumber() != 0) available=false;
+					if (m_tiles[row][col].getType() != TileType::DEFAULT || m_tiles[row][col].getOccupyNumber() != 0) available = false;
 				}
 			}
 			if (available) {
@@ -601,6 +574,6 @@ std::string Grid::getAvailableTilesString() {
 			}
 		}
 	}
-	
+
 	return output;
 }

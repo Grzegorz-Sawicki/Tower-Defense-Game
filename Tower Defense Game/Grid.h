@@ -21,11 +21,9 @@ private:
 
 public:
     Grid(std::vector<Enemy*>& enemies);
-    // Deleted copy constructor and assignment operator to prevent cloning
     Grid(const Grid&) = delete;
     Grid& operator=(const Grid&) = delete;
 
-    // Static method to access the singleton instance
     static Grid& getInstance(std::vector<Enemy*>& enemies);
 
     static void draw(sf::RenderWindow& window);
@@ -36,8 +34,6 @@ public:
     static std::map<Path, std::vector<Tile*>> getEntranceTiles();
     static std::map<Path, std::vector<Tile*>> getExitTiles();
     static Tile* getNearestTile(sf::Vector2f position);
-
-
 
     static std::map<Arrow, Tile*> setupTileNeighbors(int row, int col);
     static void resetTiles();

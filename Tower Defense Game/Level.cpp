@@ -2,10 +2,7 @@
 
 void Level::spawnEnemy()
 {
-	//Path path = static_cast<Path>(rand() % 2);
-
 	Path path = Path::HORIZONTAL;
-
 	Enemy* tmp = new Enemy(Grid::getEntranceTiles(), Path::HORIZONTAL, this->type, this->health, this->boss, this->gold, this->number);
 	this->enemies->emplace_back(tmp);
 }
@@ -13,7 +10,6 @@ void Level::spawnEnemy()
 Level::Level(std::vector<Enemy*>& enemies, int gold, int number, unsigned count, unsigned health, EnemyType type, bool boss) : 
 	gold(gold), number(number), count(count), health(health), type(type), boss(boss)
 {
-	this->active = false;
 	this->enemies = &enemies;
 	if (this->type == EnemyType::GROUP) this->enemySpawnTimer = sf::seconds(0);
 	else this->enemySpawnTimer = Properties::enemySpawnTimer;

@@ -90,19 +90,9 @@ void Enemy::move(sf::Vector2f offset)
 
 void Enemy::moveCase()
 {
-	Tile* right = this->getCurrentTile()->getNeighbors()[Arrow::RIGHT];
-	Tile* left = this->getCurrentTile()->getNeighbors()[Arrow::LEFT];
-	Tile* up = this->getCurrentTile()->getNeighbors()[Arrow::UP];
-	Tile* down = this->getCurrentTile()->getNeighbors()[Arrow::DOWN];
-	Tile* upright = this->getCurrentTile()->getNeighbors()[Arrow::UPRIGHT];
-	Tile* downright = this->getCurrentTile()->getNeighbors()[Arrow::DOWNRIGHT];
-	Tile* upleft = this->getCurrentTile()->getNeighbors()[Arrow::UPLEFT];
-	Tile* downleft = this->getCurrentTile()->getNeighbors()[Arrow::DOWNLEFT];
-
 	Tile* neighborTile = this->getCurrentTile()->getNeighbors()[this->currentArrow];
 
 	if (neighborTile != nullptr && utils::getDistance(this->getPosition(true), neighborTile->getPosition()) <= 1.f) {
-
 		if (!this->flying) this->currentTile->occupyDec();
 		this->currentTile = neighborTile;
 
@@ -120,8 +110,6 @@ void Enemy::moveCase()
 	}
 
 	this->move(this->direction * moveSpeed);
-
-
 }
 
 Tile* Enemy::chooseSpawnTile(std::map<Path, std::vector<Tile*>> entranceTiles)
@@ -161,7 +149,8 @@ sf::Vector2f Enemy::createSpawnOffset()
 	}
 }
 
-Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss, int gold, int level) : path(path), type(type), boss(boss), gold(gold), level(level)
+Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyType type, int hp, bool boss, int gold, int level) : 
+	path(path), type(type), boss(boss), gold(gold), level(level), hp(hp), maxhp(hp)
 {
 	this->handleJsonData();
 
@@ -169,45 +158,38 @@ Enemy::Enemy(std::map<Path, std::vector<Tile*>> entranceTiles, Path path, EnemyT
 	this->currentTile->occupyInc();
 	this->sprite.setPosition(this->currentTile->getPosition() + this->createSpawnOffset());
 	this->setPositionOffset(this->createPositionOffset());
-
-	this->initHealthBar();
-	this->dead = false;
 	this->direction = this->createSpawnDirection();
 	if (this->path == Path::HORIZONTAL) this->currentArrow = Arrow::RIGHT;
 	else if (this->path == Path::VERTICAL) this->currentArrow = Arrow::DOWN;
-	
-	this->reachedEntrance = false;
-	this->maxhp = hp;
-	this->hp = hp;
+
+	this->initHealthBar();
 }
 
 Enemy::Enemy(const Enemy& other, sf::Vector2f offset)
 {
 	this->level = other.level;
-	this->gold = 0;
 	this->boss = other.boss;
 	this->currentArrow = other.currentArrow;
 	this->currentTile = other.currentTile;
-	this->dead = false;
 	this->reachedEntrance = other.reachedEntrance;
 	this->path = other.path;
-	this->unDie();
-
 	this->direction = other.direction;
 	this->effects = other.effects;
 	this->healthBar = other.healthBar;
 	this->healthBarRed = other.healthBarRed;
-	this->maxhp = other.maxhp / 2;
-	this->hp = this->maxhp;
 	this->moveSpeedBase = other.moveSpeedBase;
 	this->moveSpeed = other.moveSpeedBase;
-
 	this->slowClock = other.slowClock;
 	this->slowLength = other.slowLength;
-
 	this->stunClock = other.stunClock;
 	this->stunLength = other.stunLength;
 
+	this->unDie();
+
+	this->maxhp = other.maxhp / 2;
+	this->hp = this->maxhp;
+	this->gold = 0;
+	this->dead = false;
 	this->sprite = sf::Sprite();
 	this->type = EnemyType::SPAWNED;
 	this->handleJsonData();

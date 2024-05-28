@@ -2,7 +2,8 @@
 #include "Game.h"
 #include "GameServer.h"
 
-int main() {
+//int main() {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     srand(time(NULL));
 
     Game game;
