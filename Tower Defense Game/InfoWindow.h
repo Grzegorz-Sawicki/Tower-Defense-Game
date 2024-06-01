@@ -3,11 +3,6 @@
 #include "include.h"
 #include "FontManager.hpp"
 
-/* TOWER
-
-NAME
-DESCRIPTION*/
-
 class InfoWindow
 {
 protected:

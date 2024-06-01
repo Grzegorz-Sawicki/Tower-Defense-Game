@@ -272,7 +272,7 @@ void Game::unpause() {
 }
 
 bool Game::skip() {
-	if (this->levelManager->nextLevel()) {
+	if (this->started && this->levelManager->nextLevel()) {
 		this->scoreSkip += this->timer * 2;
 		return true;
 	}

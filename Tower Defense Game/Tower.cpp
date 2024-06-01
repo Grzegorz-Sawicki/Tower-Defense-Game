@@ -34,13 +34,11 @@ void Tower::handleJsonData()
 			this->isAoe = true;
 			this->aoeRange = effect["range"];
 		}
-		//give projectiles effects table in argument
 		else if (effect["name"] == "slow") {
 			this->isSlow = true;
 			this->slowValue = effect["value"];
 			this->slowLength = effect["length"];
 		}
-		///STUN HAPPENS IN TOWER, NOT IN PROJECTILE
 		else if (effect["name"] == "stun") {
 			this->isStun = true;
 			this->stunChance = effect["chance"];

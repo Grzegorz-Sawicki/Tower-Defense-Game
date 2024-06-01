@@ -4,7 +4,6 @@ AoE::AoE(const std::vector<Enemy*>& enemies, sf::Vector2f position, float radius
 	enemies(enemies), position(position), radius(radius), damage(damage), effects(effects)
 {
 	for (json effect : this->effects) {
-		//give projectiles effects table in argument
 		if (effect["name"] == "slow") {
 			this->isSlow = true;
 			this->slowValue = effect["value"];

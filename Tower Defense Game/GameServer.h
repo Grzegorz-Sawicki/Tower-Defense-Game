@@ -21,7 +21,6 @@ private:
 public:
 	GameServer(Game& game, unsigned short portNumber);
 	void run();
-	static void test();
 
 	friend class Game;
 };

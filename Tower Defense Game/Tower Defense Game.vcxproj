@@ -150,7 +150,6 @@
     <ClCompile Include="InfoWindowTower.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelManager.cpp" />
-    <ClCompile Include="LevelScroll.cpp" />
     <ClCompile Include="LevelScrollBox.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PausableClock.cpp" />
@@ -173,7 +172,6 @@
     <ClInclude Include="InfoWindowTower.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelManager.h" />
-    <ClInclude Include="LevelScroll.h" />
     <ClInclude Include="LevelScrollBox.h" />
     <ClInclude Include="PausableClock.h" />
     <ClInclude Include="Projectile.h" />

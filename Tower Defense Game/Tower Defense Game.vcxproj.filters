@@ -63,9 +63,6 @@
     <ClCompile Include="InfoWindow.cpp">
       <Filter>Pliki źródłowe\UI</Filter>
     </ClCompile>
-    <ClCompile Include="LevelScroll.cpp">
-      <Filter>Pliki źródłowe\UI</Filter>
-    </ClCompile>
     <ClCompile Include="LevelScrollBox.cpp">
       <Filter>Pliki źródłowe\UI</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="InfoWindow.h">
-      <Filter>Pliki nagłówkowe\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelScroll.h">
       <Filter>Pliki nagłówkowe\UI</Filter>
     </ClInclude>
     <ClInclude Include="LevelScrollBox.h">

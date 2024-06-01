@@ -215,19 +215,16 @@ void GameServer::run()
 
 	std::cout << "Server is listening on port " << port << std::endl;
 
+
 	while (*game.isRunning) {
 		if (listener->accept(client) == sf::Socket::Done) {
 			std::cout << "New connection from " << client.getRemoteAddress() << std::endl;
-			handleClient();
+			std::thread clientThread(&GameServer::handleClient, this);
+			clientThread.join();
 		}
 
 	}
 
 	gameThread.join();
 
-}
-
-void GameServer::test()
-{
-	std::cout << "test" << std::endl;
 }
